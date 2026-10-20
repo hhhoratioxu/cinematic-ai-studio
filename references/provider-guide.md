@@ -10,7 +10,7 @@ python -m pip install -r requirements.txt
 python scripts/cinema.py doctor
 ```
 
-Activate the virtual environment first, or use its Python executable for the second/third commands. Windows: `.venv\Scripts\python.exe`; macOS: `.venv/bin/python`. FFmpeg: Windows `winget install --id Gyan.FFmpeg --exact`; macOS `brew install ffmpeg`; Ubuntu `sudo apt-get install ffmpeg fonts-noto-cjk`. `CINEMA_FFMPEG`, `CINEMA_FFPROBE`, and `CINEMA_FONT` can name local files. On Windows the tool also finds Gyan's WinGet installation before PATH refresh. No custom driver or security bypass is involved.
+Activate the virtual environment first, or use its Python executable for the second/third commands. Windows: `.venv\Scripts\python.exe`; macOS: `.venv/bin/python`. FFmpeg: Windows `winget install --id Gyan.FFmpeg --exact`; macOS `brew install ffmpeg-full`; Ubuntu `sudo apt-get install ffmpeg fonts-noto-cjk`. Homebrew's [full formula](https://formulae.brew.sh/formula/ffmpeg-full) includes libass; its basic formula may omit subtitle rendering. The tool prefers the full formula's keg path and `doctor` checks required filters/encoders before production. `CINEMA_FFMPEG`, `CINEMA_FFPROBE`, and `CINEMA_FONT` can name local files. On Windows the tool also finds Gyan's WinGet installation before PATH refresh. No custom driver or security bypass is involved.
 
 Keep keys in environment variables, never JSON/source/git. PowerShell example: `$env:OPENAI_API_KEY = 'YOUR_KEY'`; macOS: `export OPENAI_API_KEY='YOUR_KEY'`. Do not paste real keys into shared logs or chat.
 

@@ -58,7 +58,13 @@ def write_json(path: Path, value):
 
 
 def media_tool(name: str, configured: str | None = None) -> str:
-    candidate = configured or os.environ.get("CINEMA_" + name.upper()) or shutil.which(name)
+    candidate = configured or os.environ.get("CINEMA_" + name.upper())
+    if not candidate and __import__("sys").platform == "darwin":
+        for root in ("/opt/homebrew/opt/ffmpeg-full/bin", "/usr/local/opt/ffmpeg-full/bin"):
+            if (Path(root) / name).is_file():
+                candidate = str(Path(root) / name)
+                break
+    candidate = candidate or shutil.which(name)
     if not candidate and os.name == "nt":
         local = Path(os.environ.get("LOCALAPPDATA", str(Path.home() / "AppData/Local")))
         matches = sorted((local / "Microsoft/WinGet/Packages").glob(f"Gyan.FFmpeg_*/ffmpeg-*/bin/{name}.exe"))
@@ -68,6 +74,20 @@ def media_tool(name: str, configured: str | None = None) -> str:
     if not Path(candidate).is_file() and not shutil.which(candidate):
         raise CinemaError(f"Configured {name} executable does not exist")
     return str(candidate)
+
+
+def media_capabilities(settings=None):
+    ffmpeg = media_tool("ffmpeg", getattr(settings, "ffmpeg", None))
+    filters = command([ffmpeg, "-hide_banner", "-filters"], timeout=30).stdout
+    encoders = command([ffmpeg, "-hide_banner", "-encoders"], timeout=30).stdout
+    available_filters = {line.split()[1] for line in filters.splitlines() if len(line.split()) >= 2}
+    available_encoders = {line.split()[1] for line in encoders.splitlines() if len(line.split()) >= 2}
+    required_filters = {"ass", "blackdetect", "freezedetect", "amix", "loudnorm", "sidechaincompress"}
+    required_encoders = {"libx264", "aac", "pcm_s16le"}
+    return {"filters": {k: k in available_filters for k in sorted(required_filters)},
+            "encoders": {k: k in available_encoders for k in sorted(required_encoders)},
+            "missing_filters": sorted(required_filters - available_filters),
+            "missing_encoders": sorted(required_encoders - available_encoders)}
 
 
 def command(args: list[str], timeout: int = 1800, cwd: Path | None = None):

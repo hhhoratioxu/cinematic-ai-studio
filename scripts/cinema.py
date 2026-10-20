@@ -86,12 +86,18 @@ def doctor():
     keys = {name: bool(os.environ.get(name)) for name in
             ("OPENAI_API_KEY", "RUNWAYML_API_SECRET", "KLING_API_KEY", "KLING_ACCESS_KEY", "KLING_SECRET_KEY",
              "SYNC_API_KEY")}
+    capabilities = None
+    if tools["ffmpeg"]["available"]:
+        from common import media_capabilities
+        capabilities = media_capabilities()
     report = {"python": platform.python_version(), "python_supported": sys.version_info >= (3, 11),
               "platform": platform.platform(), "dependencies": dependencies, "media_tools": tools,
               "credential_presence_only": keys, "network_or_model_access_tested": False,
-              "paid_calls": 0, "note": "Keys are checked for presence only. No generation is requested."}
+              "paid_calls": 0, "media_capabilities": capabilities,
+              "note": "Keys are checked for presence only. No generation is requested."}
     emit(report)
-    return 0 if all(dependencies.values()) and all(t["available"] for t in tools.values()) else 2
+    full_media = capabilities and not capabilities["missing_filters"] and not capabilities["missing_encoders"]
+    return 0 if all(dependencies.values()) and all(t["available"] for t in tools.values()) and full_media else 2
 
 
 def providers():

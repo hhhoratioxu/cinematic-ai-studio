@@ -42,7 +42,7 @@ python scripts/install_skill.py
 
 安装后在新会话输入 `$cinematic-ai-studio`；如果暂时未出现，重启 Codex。使用安装目录里的脚本时，仍需选择已安装依赖的 Python。安装器不复制虚拟环境、凭据或生成项目。
 
-FFmpeg 安装：Windows `winget install --id Gyan.FFmpeg --exact`；macOS `brew install ffmpeg`。中文烧录字幕需本机中文字体，程序会寻找 Microsoft YaHei / PingFang / Noto Sans CJK；也可指定 `CINEMA_FONT` 或 `output.font_file`。
+FFmpeg 安装：Windows `winget install --id Gyan.FFmpeg --exact`；macOS `brew install ffmpeg-full`（普通 Homebrew `ffmpeg` 包可能不含 libass 字幕功能）。程序会优先寻找本机的 `ffmpeg-full`，`doctor` 会实际检查字幕、混音与编码能力。中文烧录字幕需本机中文字体，程序会寻找 Microsoft YaHei / PingFang / Noto Sans CJK；也可指定 `CINEMA_FONT` 或 `output.font_file`。
 
 ## 配置与成本
 

@@ -75,9 +75,17 @@ def check_environment(plan, settings):
     report = estimate(plan, settings)
     if report["missing_rates"]:
         raise CinemaError("Configure cost ceilings: " + ", ".join(report["missing_rates"]))
-    from common import media_tool
+    from common import media_capabilities, media_tool
     media_tool("ffmpeg", settings.ffmpeg)
     media_tool("ffprobe", settings.ffprobe)
+    capabilities = media_capabilities(settings)
+    missing_filters = set(capabilities["missing_filters"])
+    if not plan.output.burn_subtitles:
+        missing_filters.discard("ass")
+    if missing_filters or capabilities["missing_encoders"]:
+        raise CinemaError("FFmpeg is missing required filters/encoders: " +
+                          ", ".join(sorted(missing_filters) + capabilities["missing_encoders"]) +
+                          ". On macOS install ffmpeg-full (libass), or specify a full FFmpeg build.")
     return report
 
 
