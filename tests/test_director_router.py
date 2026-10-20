@@ -116,3 +116,25 @@ def test_v1_bindings_keep_old_shape_but_new_settings_cannot_hide(plan, settings)
     assert content_key(old) != content_key(snapshots(plan, settings))
     plan.shots[0].focus = "eyes"
     assert "_v2_extensions_sha256" in snapshots(plan, Settings())["plan"]
+
+
+def test_v2_story_planner_has_full_episode_output_allowance_and_stable_cache(tmp_path, plan, settings):
+    from common import write_json
+    from state import Ledger
+    from storyboard_engine import plan_story
+    calls = []
+    class Planner:
+        def response_json(self, prompt, output, model, images=(), max_tokens=16000):
+            calls.append({"prompt": prompt, "max_tokens": max_tokens})
+            write_json(output, migrate(plan).model_dump())
+            return {"evidence": "offline_mock_planner"}
+    ledger = Ledger(tmp_path / "tasks.db", 10, True)
+    result = plan_story("An employee defends himself", 2, "live_action", settings, ledger,
+                        tmp_path / "plan.json", Planner())
+    resumed = plan_story("An employee defends himself", 2, "live_action", settings, ledger,
+                         tmp_path / "other.json", Planner())
+    assert result.version == 2 and resumed == result
+    assert len(calls) == 1 and calls[0]["max_tokens"] == 32768
+    assert "schema version 2" in calls[0]["prompt"] and "Vary shot durations" in calls[0]["prompt"]
+    assert ledger.summary()["reserved_ceiling_usd"] == 0.1
+    ledger.close()

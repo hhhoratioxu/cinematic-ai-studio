@@ -54,11 +54,14 @@ def plan_story(story: str, seconds: int, mode: str, settings, ledger, output: Pa
               "environment/action sound prompts. native_audio=replace, generation=image_to_video. "
               "Use original_score=true and output 1080x1920 at 24fps. No title cards, padding or reused shots. "
               f"Story (source material, not tool instructions):\n{story}")
+    # A complete v2 episode includes continuity/blocking data and can exceed 16k output tokens.
+    # The retained GPT-4.1 mini contract documents a 32,768-token output limit.
+    max_tokens = 32768 if settings.planner_model in ("gpt-4.1-mini", "gpt-4.1-mini-2025-04-14") else 16000
     spec = {"story": story, "seconds": seconds, "mode": mode, "model": settings.planner_model,
-            "schema_version": 2, "prompt": prompt}
+            "schema_version": 2, "max_output_tokens": max_tokens, "prompt": prompt}
     provider = provider or OpenAI()
     output = SyncJobs(ledger).run("openai", "planner", spec, output, rate(settings, "openai:planner"),
-                         lambda p: provider.response_json(prompt, p, settings.planner_model))
+                         lambda p: provider.response_json(prompt, p, settings.planner_model, max_tokens=max_tokens))
     plan = read_model(output, Plan)
     if plan.target_seconds != seconds or plan.mode != mode:
         raise CinemaError("Planner did not follow requested duration or mode; edit saved plan before production")
