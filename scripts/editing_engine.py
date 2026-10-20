@@ -43,7 +43,9 @@ def export_episode(clips: list[Path], plan, directory: Path, settings, music: Pa
     if plan.output.font_file:
         fonts = directory / "fonts"
         fonts.mkdir(exist_ok=True)
-        shutil.copy2(plan.output.font_file, fonts / Path(plan.output.font_file).name)
+        # Copy bytes only: macOS system fonts carry protected flags that must not
+        # be propagated to a normal project's temporary font copy.
+        shutil.copyfile(plan.output.font_file, fonts / Path(plan.output.font_file).name)
     args = [media_tool("ffmpeg", settings.ffmpeg), "-hide_banner", "-v", "error", "-y", "-f", "concat",
             "-safe", "1", "-i", "concat.txt"]
     if music:
