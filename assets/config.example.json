@@ -1,6 +1,17 @@
 {
   "video": [
-    {"name": "runway", "model": "gen4.5", "mode": "pro"}
+    {
+      "name": "runway",
+      "model": "gen4.5",
+      "mode": "pro",
+      "purposes": [
+        "dialogue",
+        "performance",
+        "continuity",
+        "establishing"
+      ],
+      "priority": 10
+    }
   ],
   "image_model": "gpt-image-1.5",
   "image_size": "1024x1536",
@@ -15,5 +26,9 @@
   "max_attempts": 2,
   "poll_seconds": 5,
   "task_timeout_seconds": 1800,
-  "ceilings_usd": {}
+  "ceilings_usd": {},
+  "routing_policy": "purpose",
+  "motion_review": true,
+  "motion_sample_fps": 6,
+  "max_shot_regenerations": 2
 }

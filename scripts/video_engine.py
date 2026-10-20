@@ -4,6 +4,8 @@ from __future__ import annotations
 from pathlib import Path
 
 from common import CinemaError, TaskFailed, digest, write_json
+from capabilities import route
+from compatibility import character_snapshot
 from image_engine import rate
 from providers.base import AsyncJobs
 from providers.kling import Kling
@@ -37,7 +39,7 @@ def make_spec(plan, shot, characters, provider_config, first_frame=None):
             else "unused", "aspect_ratio": ratio(plan.output.width, plan.output.height, "kling")
             if provider_config.name == "kling" else "unused", **frames, "frame_hashes": hashes,
             "elements": shot.elements, "native_audio": shot.native_audio,
-            "character_bible": [c.model_dump() for c in characters]}
+            "character_bible": [character_snapshot(c, plan.version) for c in characters]}
 
 
 def provider_ready(name):
@@ -52,9 +54,19 @@ def validate_video_plan(plan, settings, require_keys=True):
     """Check every shot before buying even its first character image."""
     reports = []
     for shot in plan.shots:
+        onscreen = [d for d in shot.dialogue if d.delivery == "onscreen"]
+        if settings.lipsync == "sync" and shot.native_audio == "replace" and onscreen:
+            if len(shot.characters) != 1 or len({d.character for d in onscreen}) != 1:
+                raise CinemaError(f"{shot.id}: Sync adapter requires a single visible speaker; use reverse shots, "
+                                  "native audio, or explicitly configure lipsync=off with manual review")
+        if shot.source_video:
+            reports.append({"shot": shot.id, "usable": ["user_supplied_dynamic_video"], "skipped": []})
+            continue
         characters = [c for c in plan.characters if c.id in shot.characters]
         problems, usable = [], []
-        for config in settings.video:
+        choices, skipped = route(plan, shot, settings)
+        problems.extend(item["reason"] for item in skipped)
+        for config, _ in choices:
             try:
                 if require_keys and not provider_ready(config.name):
                     raise CinemaError("API credentials are not configured")
@@ -70,11 +82,6 @@ def validate_video_plan(plan, settings, require_keys=True):
                 problems.append(f"{config.name}: {e}")
         if not usable:
             raise CinemaError(f"Shot {shot.id} has no usable configured provider: {'; '.join(problems)}")
-        onscreen = [d for d in shot.dialogue if d.delivery == "onscreen"]
-        if settings.lipsync == "sync" and shot.native_audio == "replace" and onscreen:
-            if len(shot.characters) != 1 or len({d.character for d in onscreen}) != 1:
-                raise CinemaError(f"{shot.id}: Sync adapter requires a single visible speaker; use reverse shots, "
-                                  "native audio, or explicitly configure lipsync=off with manual review")
         reports.append({"shot": shot.id, "usable": usable, "skipped": problems})
     return reports
 
@@ -86,15 +93,19 @@ class VideoEngine:
         self.jobs = jobs or AsyncJobs(ledger, settings.poll_seconds, settings.task_timeout_seconds)
         self.factories = factories or {"runway": Runway, "kling": Kling}
 
-    def generate(self, plan, shot, characters, first_frame, directory: Path):
+    def generate(self, plan, shot, characters, first_frame, directory: Path, revision=None):
         directory.mkdir(parents=True, exist_ok=True)
         failures = []
-        for config in self.settings.video:
+        choices, skipped = route(plan, shot, self.settings)
+        failures.extend(item["reason"] for item in skipped)
+        for config, routing in choices:
             if not provider_ready(config.name) and self.factories.get(config.name) in (Runway, Kling):
                 failures.append(f"{config.name}: no credentials")
                 continue
             provider = self.factories[config.name]()
             spec = make_spec(plan, shot, characters, config, first_frame)
+            if revision:
+                spec["generation_revision"] = f"{shot.id}:{revision}"
             try:
                 provider.validate(spec)
             except CinemaError as e:
@@ -105,8 +116,12 @@ class VideoEngine:
                 if attempt:
                     attempt_spec["prompt"] = spec["prompt"].replace(
                         "no freeze", "continuous body motion, no freeze")
+                    if config.name == "runway" and len(attempt_spec["prompt"].encode("utf-16-le")) // 2 > 1000:
+                        # Keep the full original direction if optional reinforcement would exceed the API limit.
+                        attempt_spec["prompt"] = spec["prompt"]
                 provider.validate(attempt_spec)
-                output = directory / f"{config.name}_attempt_{attempt + 1}.mp4"
+                suffix = "" if len([c for c in self.settings.video if c.name == config.name]) == 1 else "_" + config.model.replace(".", "_")
+                output = directory / f"{config.name}{suffix}_attempt_{attempt + 1}.mp4"
                 try:
                     output, key = self.jobs.run(provider, attempt_spec, output,
                                                rate(self.settings, f"{config.name}:video:{config.model}",
@@ -117,19 +132,20 @@ class VideoEngine:
                     continue
                 # Transport/download failures and uncertain submissions intentionally propagate.
                 qc = inspect_video(output, self.settings, duration=shot.duration,
-                                   require_audio=shot.native_audio == "preserve")
+                                   require_audio=shot.native_audio == "preserve", shot=shot)
                 if self.settings.vision_qc and qc["technical_pass"]:
                     qc["vision"] = vision_check(output, shot, characters, self.settings, self.ledger,
-                                                 directory / f"vision_{config.name}_{attempt}")
+                                                 directory / f"vision_{config.name}{suffix}_{attempt}")
                     if qc["vision"]["severe_issue"]:
                         qc["issues"].append("vision_model_flagged_severe_issue")
                         qc["technical_pass"] = False
-                write_json(directory / f"qc_{config.name}_{attempt + 1}.json", qc)
+                write_json(directory / f"qc_{config.name}{suffix}_{attempt + 1}.json", qc)
                 if qc["technical_pass"]:
                     row = self.ledger.get(key)
                     return output, {"shot_id": shot.id, "provider": config.name, "model": config.model,
                                     "task_id": row["task_id"], "task_key": key, "sha256": digest(output),
                                     "qc": qc, "evidence": getattr(provider, "evidence", "real_api_video"),
+                                    "routing": routing, "requested_parameters": spec,
                                     "failures_before_acceptance": failures}
                 self.ledger.update(key, state="rejected", error=",".join(qc["issues"]))
                 failures.append(f"{shot.id} {config.name} attempt {attempt + 1}: {qc['issues']}")

@@ -33,8 +33,13 @@ jobs:
         run: python -m ruff check scripts tests
       - name: Validate skill metadata and sample plan
         run: python tests/validate_distribution.py
-      - name: Offline A-H and recovery tests
+      - name: Offline A-H, motion, director, recovery and loopback workbench tests
         run: python -m pytest -q --junitxml=test-results.xml
+      - name: Read-only runtime and capability checks
+        run: |
+          python scripts/cinema.py --version
+          python scripts/cinema.py doctor
+          python scripts/cinema.py providers
       - uses: actions/upload-artifact@v4
         if: always()
         with:

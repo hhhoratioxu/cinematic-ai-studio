@@ -13,7 +13,7 @@ def prepare_characters(plan: Plan, image_engine, directory: Path, base: Path):
         character = original.model_copy(deep=True)
         for view, value in character.references.items():
             character.references[view] = str(resolve_asset(value, base))
-        for view in ("front", "side", "full_body"):
+        for view in ("front", "side", "full_body", *character.expression_views):
             if view in character.references:
                 continue
             refs = [Path(character.references["front"])] if "front" in character.references else []
@@ -35,9 +35,22 @@ def merge_bible(plan: Plan, bible: list[Character]):
     for current in plan.characters:
         old = previous.get(current.id)
         if old:
-            for key in ("face", "hair", "build", "wardrobe", "voice", "style"):
+            for key in ("face", "hair", "build", "voice", "style"):
                 if getattr(old, key) != getattr(current, key):
                     raise ValueError(f"Character {current.id} changed {key}; explicitly version the Character ID")
-            current = current.model_copy(update={"references": old.references})
+            if old.wardrobe != current.wardrobe:
+                if current.wardrobe_version == "default" or current.costumes.get(current.wardrobe_version) != current.wardrobe:
+                    raise ValueError(f"Character {current.id} changed wardrobe; declare a costume version and references")
+                refs = current.reference_sets.get(current.wardrobe_version, {})
+                if not refs.get("front"):
+                    raise ValueError("Versioned wardrobe needs an explicit front reference")
+            else:
+                refs = old.references
+            for version in set(old.costumes) & set(current.costumes):
+                if old.costumes[version] != current.costumes[version]:
+                    raise ValueError(f"Costume {version} changed; create a new version")
+            current = current.model_copy(update={"references": refs,
+                "costumes": {**old.costumes, **current.costumes},
+                "reference_sets": {**old.reference_sets, **current.reference_sets}})
         result.append(current)
     return plan.model_copy(update={"characters": result})

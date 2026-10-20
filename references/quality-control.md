@@ -11,6 +11,9 @@ The pipeline checks source clips before accepting a shot and checks the final MP
 | Black / freeze | FFmpeg blackdetect and freezedetect, including an unfinished freeze at EOF | Dark intentional scenes or a deliberate held pose can require editorial review |
 | Missing shots | Plan-to-accepted-source coverage | Does not judge plot quality |
 | Repeated footage | Per-shot decoded low-resolution frame MD5 sequence | Exact decoded duplicates; near duplicates may escape |
+| Sampled motion | LK optical flow, RANSAC camera compensation, subject/center residuals, repeated samples, temporal thirds, cut/flash triage | Sampled evidence, false positives/negatives; ambiguous and intentional holds need review |
+| Continuity plan | Scene and input/output state changes with explicit reasons | Validates declared plans, cannot observe actual wardrobe/props/eyelines |
+| Manual review | Current-source SHA-256, reviewer, observation and approve/reject history | Human judgement; new bytes invalidate the old decision |
 | Character / action / anatomy | Default paid vision review of references and three chronological frames | Probabilistic sparse sampling; false positives/negatives possible |
 | Subtitles | Window bounds, selected-font measured two-line layout and safe margins | Real rendered glyph bounds still need visual review |
 | API failures | Persistent failed/uncertain task states and bounded shot attempts | Never refund a reserved amount without billing evidence |

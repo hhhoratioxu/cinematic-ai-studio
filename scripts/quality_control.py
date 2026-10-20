@@ -23,7 +23,7 @@ def probe(path: Path, settings=None):
         raise CinemaError("Invalid FFprobe media report") from e
 
 
-def inspect_video(path: Path, settings=None, duration=None, output=None, require_audio=False):
+def inspect_video(path: Path, settings=None, duration=None, output=None, require_audio=False, shot=None):
     try:
         data = probe(path, settings)
     except CinemaError:
@@ -76,7 +76,7 @@ def inspect_video(path: Path, settings=None, duration=None, output=None, require
     freeze_starts = re.findall(r"freeze_start:\s*([0-9.]+)", analysis)
     if blacks:
         issues.append("black_frames")
-    if freeze_starts:
+    if freeze_starts and not (shot and shot.motion_policy in ("hold", "subtle")):
         issues.append("frozen_frames")
     report = {"file": str(path.resolve()), "sha256": digest(path), "duration": data["duration"], "fps": fps,
               "width": video.get("width") if video else None, "height": video.get("height") if video else None,
@@ -86,12 +86,45 @@ def inspect_video(path: Path, settings=None, duration=None, output=None, require
               "semantic_quality": "unverified",
               "limitations": ["Motion detection cannot prove acting, anatomy, identity or lip-sync accuracy.",
                               "AV stream timestamps do not measure mouth-to-speech alignment."]}
+    if getattr(settings, "motion_review", False):
+        try:
+            from motion_engine import analyze_motion
+            report["motion"] = analyze_motion(path, settings, shot, data["duration"])
+        except (ImportError, CinemaError, ValueError, RuntimeError) as exc:
+            report["motion"] = {"status": "needs_review", "flags": ["analysis_unavailable"],
+                                "reason": type(exc).__name__}
+    if data["audio"]:
+        result = command([executable, "-hide_banner", "-i", str(path), "-vn", "-af", "volumedetect",
+                          "-f", "null", "-"], timeout=1800)
+        match = re.search(r"max_volume:\s*([-\w.]+) dB", result.stderr)
+        peak = float(match[1]) if match and match[1] != "-inf" else None
+        report["audio_review"] = {"sample_peak_dbfs": peak, "possible_clipping": peak is not None and peak >= -0.1,
+                                  "true_peak_and_lip_sync": "requires audiovisual review"}
+    report["review_status"] = "needs_review"
     return report
 
 
 def require_pass(report, shot_id):
     if not report["technical_pass"]:
         raise CinemaError(f"Shot {shot_id} QC failed: {', '.join(report['issues'])}")
+
+
+def inspect_episode(path, plan, settings):
+    report = inspect_video(path, settings, plan.target_seconds, plan.output, require_audio=True)
+    # A declared held close-up is evaluated at shot level. Map every final freeze
+    # interval start back to its shot; do not relax the gate for unrelated freezes.
+    if "frozen_frames" in report["issues"]:
+        spans, cursor = [], 0
+        for shot in plan.shots:
+            spans.append((cursor, cursor + shot.duration, shot.motion_policy))
+            cursor += shot.duration
+        allowed = all(any(start - 0.05 <= t < end and policy in ("hold", "subtle")
+                          for start, end, policy in spans) for t in report["freeze_starts"])
+        if allowed:
+            report["issues"].remove("frozen_frames")
+            report["intentional_hold_review"] = "Declared holds still require hash-bound motion/editorial review"
+            report["technical_pass"] = not report["issues"]
+    return report
 
 
 def frame_samples(path: Path, directory: Path, settings, duration: float):
@@ -121,7 +154,7 @@ def vision_check(path, shot, characters, settings, ledger, directory, provider=N
     spec = {"model": settings.vision_model, "prompt": prompt, "images": [digest(p) for p in refs + frames]}
     api = provider or OpenAI()
     output = directory / "vision.json"
-    SyncJobs(ledger).run("openai", "vision", spec, output, rate(settings, "openai:vision"),
+    output = SyncJobs(ledger).run("openai", "vision", spec, output, rate(settings, "openai:vision"),
                          lambda p: api.response_json(prompt, p, settings.vision_model, refs + frames, 1200))
     result = json.loads(output.read_text(encoding="utf-8"))
     if not isinstance(result.get("severe_issue"), bool):

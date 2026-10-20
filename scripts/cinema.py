@@ -20,8 +20,9 @@ def emit(value):
 
 
 def parser():
+    from version import VERSION
     p = argparse.ArgumentParser(description="Real AI video production for Codex. No paid generation by default.")
-    p.add_argument("--version", action="version", version="cinematic-ai-studio 0.1.0")
+    p.add_argument("--version", action="version", version="cinematic-ai-studio " + VERSION)
     sub = p.add_subparsers(dest="command", required=True)
     sub.add_parser("doctor", help="Offline dependency, media tool, and credential-presence checks")
     sub.add_parser("providers", help="Verified provider capabilities and documentation links")
@@ -62,6 +63,34 @@ def parser():
     resolve.add_argument("--task-id")
     resolve.add_argument("--import-file", type=Path)
     resolve.add_argument("--note", required=True, help="Evidence used to reconcile the existing paid action")
+    for name in ("status", "cost", "render", "review", "studio", "regenerate"):
+        q = sub.add_parser(name, help={"status": "Read-only project/shot/task status", "cost": "Read-only budget reservations",
+            "render": "Re-edit accepted dynamic sources locally; zero paid calls", "review": "Inspect quality or record hash-bound human review",
+            "studio": "Open the private local production workbench", "regenerate": "Replace exactly one shot within the original budget"}[name])
+        q.add_argument("--out", type=Path, required=True)
+        if name == "render":
+            q.add_argument("--plan", type=Path, help="Optional reordered edit/music/output plan; same shots/durations/dialogue")
+        if name == "review":
+            q.add_argument("--target", help="Shot ID, or episode")
+            q.add_argument("--scope", choices=["motion", "editorial"], default="editorial")
+            q.add_argument("--decision", choices=["approve", "reject"])
+            q.add_argument("--reviewer")
+            q.add_argument("--note")
+            q.add_argument("--sha256", help="Exact SHA-256 of the media actually reviewed")
+            q.add_argument("--raw", action="store_true", help="Review original footage before paid lip-sync")
+        if name == "studio":
+            q.add_argument("--port", type=int, default=8765)
+            q.add_argument("--no-open", action="store_true")
+        if name == "regenerate":
+            q.add_argument("--shot-id", required=True)
+            q.add_argument("--shot-file", type=Path, help="Replacement shot JSON; same ID and duration")
+            q.add_argument("--budget-usd", type=float, required=True)
+            q.add_argument("--allow-paid", action="store_true")
+            q.add_argument("--note", required=True)
+            q.add_argument("--render", action="store_true", help="Re-edit existing accepted sources after replacement")
+    migrate = sub.add_parser("migrate", help="Convert a v1 plan to v2 locally; inferred direction needs review")
+    migrate.add_argument("--plan", type=Path, required=True)
+    migrate.add_argument("--output", type=Path, required=True)
     return p
 
 
@@ -74,7 +103,7 @@ def generation_args(q):
 
 def doctor():
     import platform
-    dependencies = {m: importlib.util.find_spec(m) is not None for m in ("httpx", "pydantic", "PIL", "yaml")}
+    dependencies = {m: importlib.util.find_spec(m) is not None for m in ("httpx", "pydantic", "PIL", "yaml", "numpy", "cv2")}
     tools = {}
     for name in ("ffmpeg", "ffprobe"):
         from common import CinemaError, media_tool
@@ -101,7 +130,8 @@ def doctor():
 
 
 def providers():
-    emit({"checked": "2026-10-20", "adapters": [
+    from capabilities import matrix
+    emit({"checked": "2026-10-20", "video_capability_matrix": matrix(), "adapters": [
         {"provider": "OpenAI", "capabilities": ["text_to_image", "reference_image_edit", "Mandarin_TTS",
                                                  "story_planning", "probabilistic_vision_QC"],
          "docs": "https://developers.openai.com/api/docs/guides/image-generation"},
@@ -162,6 +192,42 @@ def main(argv=None):
     from common import CinemaError, content_key, write_json
     from models import Character, Plan, Settings, read_model
     from state import Ledger, run_lock
+    if args.command == "migrate":
+        from director_engine import migrate
+        plan = migrate(read_model(args.plan, Plan))
+        if args.output.exists():
+            raise CinemaError("Migration output already exists; choose a new output to preserve the original")
+        write_json(args.output, plan.model_dump())
+        emit({"output": str(args.output.resolve()), "version": 2, "paid_calls": 0, "director_review_required": True})
+        return 0
+    if args.command in ("status", "cost", "render", "review", "studio", "regenerate"):
+        from project import quality_review, regenerate, render_from_assets, review_asset, status, task_snapshot
+        args.out = args.out.resolve()
+        if args.command == "status":
+            emit(status(args.out))
+        elif args.command == "cost":
+            emit(task_snapshot(args.out))
+        elif args.command == "studio":
+            from studio import run
+            run(args.out, args.port, not args.no_open)
+        elif args.command == "render":
+            with run_lock(args.out):
+                emit(render_from_assets(args.out, args.plan))
+        elif args.command == "review":
+            if args.decision:
+                if not all((args.target, args.reviewer, args.note, args.sha256)):
+                    raise CinemaError("Recording a review requires --target --reviewer --note --sha256")
+                with run_lock(args.out):
+                    emit(review_asset(args.out, args.target, args.scope, args.decision, args.reviewer,
+                                      args.note, args.sha256, args.raw))
+            else:
+                emit(quality_review(args.out, save=False))
+        else:
+            paid_guard(args)
+            with run_lock(args.out):
+                emit(regenerate(args.out, args.shot_id, args.budget_usd, args.allow_paid, args.note,
+                                args.shot_file, args.render))
+        return 0
     if args.command == "schema":
         emit((Plan if args.kind == "plan" else Character).model_json_schema())
         return 0
@@ -208,12 +274,22 @@ def main(argv=None):
         saved = json.loads((args.out / "run.json").read_text(encoding="utf-8"))
         if saved.get("test_only"):
             raise CinemaError("Test fixtures cannot be resumed as production")
+        if args.budget_usd != saved.get("budget_usd"):
+            raise CinemaError("Resume requires the original authorized budget")
         if not args.allow_paid:
             raise CinemaError("Resume may create unfinished assets; pass --allow-paid with original budget")
         from pipeline import render_episode
         with run_lock(args.out):
-            result = render_episode(Plan.model_validate(saved["plan"]), Settings.model_validate(saved["settings"]),
-                                    args.out, args.budget_usd, True, event=emit)
+            from project import read_json, regenerate, render_from_assets
+            revisions = read_json(args.out / "revisions.json", [])
+            if revisions:
+                active = [r for r in revisions if r["state"] == "in_progress"]
+                for revision in active:
+                    result = regenerate(args.out, revision["shot"], args.budget_usd, True, revision["note"])
+                result = render_from_assets(args.out)
+            else:
+                result = render_episode(Plan.model_validate(saved["plan"]), Settings.model_validate(saved["settings"]),
+                                        args.out, args.budget_usd, True, event=emit)
         emit({k: result[k] for k in ("status", "output", "sha256", "cost")})
         return 0
     settings = configured(args.config)
@@ -256,6 +332,15 @@ def main(argv=None):
             report["capability_checks"] = validate_video_plan(plan, settings, require_keys=False)
             emit(report)
             if args.command in ("estimate", "plan") or not args.allow_paid:
+                if args.command == "plan":
+                    from director_engine import production_packet
+                    args.out.mkdir(parents=True, exist_ok=True)
+                    if (args.out / "run.json").exists():
+                        raise CinemaError("Plan workspace already exists; choose a new output directory")
+                    write_json(args.out / "run.json", {"plan": plan.model_dump(), "settings": settings.model_dump(),
+                                                      "budget_usd": None, "test_only": False})
+                    write_json(args.out / "shot_plan.json", plan.model_dump())
+                    production_packet(plan, args.out)
                 return 0
             with run_lock(args.out):
                 result = render_episode(plan, settings, args.out, args.budget_usd, True, event=emit)

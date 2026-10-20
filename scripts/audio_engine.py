@@ -53,11 +53,16 @@ class AudioEngine:
         for i, line in enumerate(shot.dialogue):
             voice = by_id[line.character].voice
             instructions = f"Speak in natural Mandarin Chinese. Emotion and delivery: {line.emotion}."
+            character = by_id[line.character]
+            if character.speech_style:
+                instructions += f" Stable character delivery: {character.speech_style}."
+            if character.speech_speed != 1:
+                instructions += f" Intended relative speaking pace {character.speech_speed:.2f}; honor punctuation and pauses."
             spec = {"text": line.text, "voice": voice, "instructions": instructions,
                     "model": self.settings.tts_model}
             raw = directory / f"tts_{content_key(spec)[:16]}.wav"
             api = self.provider or OpenAI()
-            SyncJobs(self.ledger).run("openai", "tts", spec, raw, rate(self.settings, "openai:tts"),
+            raw = SyncJobs(self.ledger).run("openai", "tts", spec, raw, rate(self.settings, "openai:tts"),
                                      lambda p: api.speech(line.text, voice, instructions, p,
                                                           self.settings.tts_model))
             info = probe(raw, self.settings)
@@ -92,8 +97,16 @@ class AudioEngine:
         for i, track in enumerate(tracks, 1):
             args += ["-i", str(track["file"])]
             ms = round(track["start"] * 1000)
+            effects = f"volume={track.get('gain_db', 0)}dB"
+            if track.get("duration"):
+                effects += f",atrim=duration={track['duration']}"
+            if track.get("fade_in", 0):
+                effects += f",afade=t=in:d={min(track['fade_in'], track.get('duration', seconds))}"
+            if track.get("fade_out", 0):
+                end = track.get("duration", seconds - track["start"])
+                effects += f",afade=t=out:st={max(0, end-track['fade_out'])}:d={min(end, track['fade_out'])}"
             filters.append(f"[{i}:a]aresample=48000,aformat=channel_layouts=stereo,"
-                           f"volume={track.get('gain_db', 0)}dB,adelay={ms}|{ms}[a{i}]")
+                           f"{effects},adelay={ms}|{ms}[a{i}]")
             labels.append(f"[a{i}]")
         filters.append("".join(labels) + f"amix=inputs={len(labels)}:duration=first:normalize=0,"
                        f"atrim=duration={seconds},alimiter=limit=0.95[out]")
@@ -115,7 +128,8 @@ class AudioEngine:
             info = probe(output, self.settings)
             if not info["audio"]:
                 raise CinemaError(f"{shot.id}: sound {sound.id} is not valid audio")
-            tracks.append({"file": output, "start": sound.start, "gain_db": sound.gain_db})
+            tracks.append({"file": output, "start": sound.start, "gain_db": sound.gain_db,
+                           "duration": sound.duration, "fade_in": sound.fade_in, "fade_out": sound.fade_out})
         return tracks
 
 

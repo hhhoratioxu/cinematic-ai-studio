@@ -35,6 +35,13 @@ class ImageEngine:
                   "Use all supplied character references with the same identities, hair, wardrobe and proportions. "
                   "No panels, collage, subtitles, logos or extra characters. " +
                   " ".join(c.identity() for c in characters))
+        if plan.version == 2:
+            import json
+            scene = next((s for s in plan.scenes if s.id == shot.scene_id), None)
+            prompt += " Planned scene: " + (scene.model_dump_json() if scene else shot.environment)
+            prompt += " Starting continuity: " + shot.continuity_in.model_dump_json()
+            prompt += " Blocking: " + json.dumps([b.model_dump() for b in shot.blocking], ensure_ascii=False)
+            prompt += " Focus: " + shot.focus
         refs = [Path(c.references["front"]) for c in characters]
         output = directory / f"{shot.id}_{content_key(prompt)[:12]}.png"
         return self.generate(prompt, output, refs)

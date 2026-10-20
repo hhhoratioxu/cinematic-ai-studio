@@ -23,6 +23,8 @@ Use this skill's Python tools to produce original characters, images, moving sho
 3. Use `estimate --plan PROJECT/shot_plan.json --config PROJECT/config.json`, then the matching `episode` command with the already-authorized budget. The executor generates missing character views and scene first frames, submits real video jobs, synthesizes timed Mandarin voices, optionally performs lip sync, mixes licensed/original audio, creates subtitles and exports MP4.
 4. For voice/timing decisions read [audio pipeline](references/audio-pipeline.md). Default Sync lip-sync shots require one visible speaker. Use reverse shots and separate interaction shots; keep additional speakers offscreen where appropriate. Disabling lip sync must be disclosed as unsynchronized dubbing. Native audio is either preserved once or replaced once.
 5. Read [quality control](references/quality-control.md), inspect per-shot/final reports and review the actual film. Technical success does not establish correct identity, anatomy, acting, subtitle glyph rendering or mouth-to-speech alignment. Sparse-frame vision checks report uncertainty. Regenerate only rejected shots within the configured retry and budget limits.
+6. For v0.5 production, read [director, continuity, routing and workbench](references/production-v2.md). Prefer schema v2 with timed action beats, scene IDs, blocking/eyelines/focus, costume versions and explicit continuity states. `plan` writes a reviewable local packet. `studio --out PROJECT` opens the private local workbench; its review actions never buy generation. `status`, `cost` and `review` inspect saved evidence; `render` re-edits accepted dynamic sources locally. `regenerate` replaces exactly one shot under the original explicit budget and bounded revision count.
+7. Treat motion heuristics as triage: camera-compensated optical flow and region residuals may flag planar pan/zoom, repeated content or uncertain subject motion. A held close-up, subtle performance or ambiguous result requires exact-hash human review. Review uncertain raw footage before paying for lip sync. Preserve all raw/synced versions and costs. Never equate motion metrics or the software version with cinematic acceptance.
 
 ## Commands
 
@@ -38,6 +40,9 @@ python scripts/cinema.py episode --plan PROJECT/shot_plan.json --config PROJECT/
 python scripts/cinema.py shot --plan PROJECT/shot_plan.json --shot-id s001 --config PROJECT/config.json --out PROJECT/shot_s001
 python scripts/cinema.py image --prompt "Original cinematic character" --config PROJECT/config.json --out PROJECT/images
 python scripts/cinema.py inspect PROJECT/render/episode_01.mp4 --plan PROJECT/shot_plan.json
+python scripts/cinema.py studio --out PROJECT/render
+python scripts/cinema.py review --out PROJECT/render
+python scripts/cinema.py render --out PROJECT/render
 ```
 
 Without `--allow-paid`, generation commands estimate only. After user authorization, add `--allow-paid --budget-usd AMOUNT`. Resume an episode with `resume --out PROJECT/render --allow-paid --budget-usd ORIGINAL_AMOUNT`.
