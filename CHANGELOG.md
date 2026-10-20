@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.1 — 2026-10-20
+
+- Distribute only the reusable Skill: move bundled production inputs outside the repository and replace character examples with neutral field structure.
+- Retain complete timeline/schema/provider coverage through procedural, non-narrative test fixtures; no production code loads a test fixture.
+- Build each production from the user's own story or plan, require an explicit story runtime, and default to a unique external project directory.
+- Reject production writes inside Skill copies, extend private-output ignore rules, and audit both tracked content and installation ZIP inputs with a release allowlist.
+- Keep managed-install backups and legacy upgrades using opaque tree fingerprints; preserve earlier releases unchanged.
+
 ## 0.5.0 — 2026-10-20
 
 - Add sampled optical flow, camera-compensated residuals, region motion, repeated-content and flash/cut triage; uncertain footage requires human review.

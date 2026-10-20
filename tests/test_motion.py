@@ -50,7 +50,7 @@ def test_motion_detects_camera_only_planar_pan(settings, motion_clips):
 
 def test_motion_compensates_camera_and_measures_independent_region(settings, motion_clips, shot):
     from models import SubjectRegion
-    shot.subject_regions = [SubjectRegion(character="lin_chen", box=(0.15, 0.15, 0.7, 0.8), source="user")]
+    shot.subject_regions = [SubjectRegion(character="actor_a", box=(0.15, 0.15, 0.7, 0.8), source="user")]
     pan = analyze_motion(motion_clips["pan"], settings, shot)
     dynamic = analyze_motion(motion_clips["articulated"], settings, shot)
     assert dynamic["camera_compensated_change"] > pan["camera_compensated_change"] + 0.5

@@ -21,6 +21,8 @@ class ImageEngine:
         self.provider = provider
 
     def generate(self, prompt: str, output: Path, references=()):
+        from workspace import ensure_external_project
+        output = ensure_external_project(output)
         spec = {"prompt": prompt, "model": self.settings.image_model, "size": self.settings.image_size,
                 "quality": self.settings.image_quality, "references": [digest(p) for p in references]}
         provider = self.provider or OpenAI()

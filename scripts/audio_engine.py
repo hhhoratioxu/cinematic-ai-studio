@@ -16,6 +16,8 @@ from quality_control import probe
 
 def original_score(path: Path, seconds: float):
     """An original procedural ambient chord bed, explicitly not AI-composed music."""
+    from workspace import ensure_external_project
+    path = ensure_external_project(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     sr = 22050
     chords = [(130.81, 155.56, 196.0), (103.83, 130.81, 155.56),
@@ -45,6 +47,8 @@ class AudioEngine:
         self.jobs = jobs or AsyncJobs(ledger, settings.poll_seconds, settings.task_timeout_seconds)
 
     def dialogue(self, shot, characters, directory: Path):
+        from workspace import ensure_external_project
+        directory = ensure_external_project(directory)
         directory.mkdir(parents=True, exist_ok=True)
         rendered = []
         by_id = {c.id: c for c in characters}
@@ -89,6 +93,8 @@ class AudioEngine:
         return self.mix(seconds, [], output)
 
     def mix(self, seconds, tracks, output):
+        from workspace import ensure_external_project
+        output = ensure_external_project(output)
         output.parent.mkdir(parents=True, exist_ok=True)
         args = [media_tool("ffmpeg", self.settings.ffmpeg), "-v", "error", "-y", "-f", "lavfi",
                 "-i", "anullsrc=r=48000:cl=stereo"]

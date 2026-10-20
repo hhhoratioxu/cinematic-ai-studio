@@ -5,50 +5,57 @@ description: Generate cinematic AI images, live-action movies, animated films, m
 
 # Cinematic AI Studio
 
-Use this skill's Python tools to produce original characters, images, moving shots, and complete episodes. Resolve `scripts/` relative to this file, and keep production projects outside the installed skill. Run `python scripts/cinema.py doctor` and `providers` first; see [provider guide](references/provider-guide.md) for keys, capabilities and setup.
+Create the requested film from the user's current creative brief, story, script, references or shot plan. There is no bundled production, fixed cast or default screenplay. Resolve tools relative to this file. Start with `python scripts/cinema.py doctor` and `providers`; read the [provider guide](references/provider-guide.md) for setup and verified adapter capabilities.
+
+## Project boundary
+
+- Create a separate local project for each user's production, outside every Skill installation and repository; for example `E:\SKILL\projects\<project-name>\`. If the user has an existing project, preserve it and its original output directory, budget and task ledger.
+- Store that user's story, Character Bible, scene/shot plans, references, generated images/video/audio, subtitles, task records, reviews and costs inside the external project. Never add productions to this repository, documentation, tests, screenshots or release archives. Structure examples describe fields only.
+- The CLI defaults new output to a unique directory below `~/CinematicAIStudio/projects/`; `CINEMA_PROJECTS_DIR` can select another external root. An explicit `--out` selects the user's project. Production writes inside a Skill copy are rejected.
+- Test fixtures are synthetic technical data. Never load them as a user's story or deliver them as a film.
 
 ## Production contract
 
-- Narrative footage must come from a real video-generation API. Do not replace a failed shot with a still, slideshow, Ken Burns move, loop, title card, freeze or black padding. FFmpeg performs postproduction only.
-- Preserve requested runtime and episode scope. A 180-second first episode needs its full conflict, development, reversal and ending, with shot durations totaling 180. A test excerpt is not that episode.
-- Use original characters or user-authorized reference images. Preserve their Character IDs, wardrobe, voice IDs and reference images across shots and episodes. Read [character consistency](references/character-consistency.md).
-- Run all ordinary development/tests offline. Paid calls require configured provider keys **and explicit user authorization with a USD budget**. An API key, a general movie request, and the presence of `--allow-paid` in an example do not independently authorize spending. Never choose a budget for the user.
-- Before paid work, show `estimate` output with the reviewed rates and scope. `--allow-paid --budget-usd AMOUNT` encodes the user's existing authorization; do not repeatedly ask when it is already sufficient. If a rate is unknown, resolve it from current official pricing and the user's account before populating the cost ceiling.
-- Uncertain submissions keep their reservation and stop. Use `reconcile` with a confirmed existing task/result; never clear the ledger or resubmit to guess whether the first request was charged. Never silently change the authorized budget on resume.
+- Use real video-generation models or authorized actual dynamic footage for narrative shots. Do not substitute stills, slideshows, Ken Burns moves, loops, frozen/black padding or title cards. FFmpeg performs postproduction.
+- Preserve the user's requested scope and runtime. Design variable, model-supported durations whose sum exactly matches this production. A preview or single test shot is not a requested complete film.
+- Use original/user-authorized references. Preserve Character IDs, identities, wardrobe versions, voices and reference conditioning across shots and episodes; read [character consistency](references/character-consistency.md).
+- Paid actions require provider credentials and explicit user authorization with a USD budget. A Key, general movie request or copied example flag is insufficient. Show the reviewed estimate before paid work and encode existing authorization with `--allow-paid --budget-usd AMOUNT`; do not choose or increase the budget.
+- Keep unknown/failed charges reserved. Reconcile uncertain submissions using confirmed tasks/results before another purchase. Known tasks resume without resubmission, and retries/revisions stay bounded.
 
-## Work with Codex
+## Build the current production
 
-1. Translate the story into a Character Bible and validated `shot_plan.json`. Use `python scripts/cinema.py schema plan` and [shot generation](references/shot-generation.md). Codex can author this plan directly without an extra planner API call. For unattended CLI story planning use `episode --story-file ...`, which charges a separately reserved OpenAI planner call before estimating the planned assets.
-2. Select `live_action`, `anime`, `motion_comic`, or `ai_drama`; use `visual_style` to choose live action or animation within drama. Direct sequenced body and facial actions, expressive reactions and motivated camera choices. Read [cinematic style](references/cinematic-style.md).
-3. Use `estimate --plan PROJECT/shot_plan.json --config PROJECT/config.json`, then the matching `episode` command with the already-authorized budget. The executor generates missing character views and scene first frames, submits real video jobs, synthesizes timed Mandarin voices, optionally performs lip sync, mixes licensed/original audio, creates subtitles and exports MP4.
-4. For voice/timing decisions read [audio pipeline](references/audio-pipeline.md). Default Sync lip-sync shots require one visible speaker. Use reverse shots and separate interaction shots; keep additional speakers offscreen where appropriate. Disabling lip sync must be disclosed as unsynchronized dubbing. Native audio is either preserved once or replaced once.
-5. Read [quality control](references/quality-control.md), inspect per-shot/final reports and review the actual film. Technical success does not establish correct identity, anatomy, acting, subtitle glyph rendering or mouth-to-speech alignment. Sparse-frame vision checks report uncertainty. Regenerate only rejected shots within the configured retry and budget limits.
-6. For v0.5 production, read [director, continuity, routing and workbench](references/production-v2.md). Prefer schema v2 with timed action beats, scene IDs, blocking/eyelines/focus, costume versions and explicit continuity states. `plan` writes a reviewable local packet. `studio --out PROJECT` opens the private local workbench; its review actions never buy generation. `status`, `cost` and `review` inspect saved evidence; `render` re-edits accepted dynamic sources locally. `regenerate` replaces exactly one shot under the original explicit budget and bounded revision count.
-7. Treat motion heuristics as triage: camera-compensated optical flow and region residuals may flag planar pan/zoom, repeated content or uncertain subject motion. A held close-up, subtle performance or ambiguous result requires exact-hash human review. Review uncertain raw footage before paying for lip sync. Preserve all raw/synced versions and costs. Never equate motion metrics or the software version with cinematic acceptance.
+1. Use the current user's story, requested mode/runtime/format and authorized references to create project-specific Character/Scene Bibles and `shot_plan.json`. Codex may author the JSON directly using `schema plan`, avoiding an extra planner charge. The optional budgeted `--story-file` planner requires the user's explicit `--seconds` and never assumes a fixed story or runtime.
+2. Select `live_action`, `anime`, `motion_comic` or `ai_drama`. Read [cinematic style](references/cinematic-style.md) and [shot generation](references/shot-generation.md). Design sequenced actions, expressions, eyelines, focus, camera motion and meaningful transitions.
+3. Prefer schema v2: timed action beats, scene IDs, blocking, wardrobe versions, continuity input/output and explained intentional changes. Read [v2 production](references/production-v2.md). `plan --plan PROJECT/shot_plan.json --out PROJECT/render` compiles a local director packet; it does not invent content.
+4. Run `estimate` with the user's plan and reviewed config. Once authorized, the executor can create missing reference/first-frame images, submit supported real video jobs, synthesize timed Mandarin dialogue, perform suitable lip sync, mix sound/music, subtitle, edit and export MP4. Record actual models, parameters, task IDs, source hashes and costs.
+5. Read [audio pipeline](references/audio-pipeline.md). Keep stable voices and delivery style; measure actual speech fit. Sync requires one visible dubbed speaker; use reverse shots or an explicit supported alternative. Preserve native audio once or replace it once. Disclose disabled/unverified lip sync and unverified anime adaptation.
+6. Read [quality control](references/quality-control.md). Motion evidence, sparse-frame vision and planned continuity cannot certify identity, acting, anatomy or mouth-to-speech alignment. Intentional holds/subtle performance and uncertain motion require exact-hash human review. Review uncertain raw video before paying for lip sync; retain raw/synced versions.
+7. Use `studio --out PROJECT/render` for local previews, tasks, costs and hash-bound review. It never submits generation. `regenerate` replaces a single shot under the original budget and revision bound; `render` re-edits accepted existing dynamic sources without paid calls.
 
 ## Commands
 
-All entry points have `--help`. These examples contain no paid authorization:
+`PROJECT` below is the external directory for the current user input. All commands have `--help`; these examples contain no paid authorization.
 
 ```text
 python scripts/cinema.py doctor
 python scripts/cinema.py providers
 python scripts/cinema.py schema plan
 python scripts/cinema.py character --bible PROJECT/characters.json
-python scripts/cinema.py estimate --plan assets/episode01.plan.json --config PROJECT/config.json
+python scripts/cinema.py estimate --plan PROJECT/shot_plan.json --config PROJECT/config.json
+python scripts/cinema.py plan --plan PROJECT/shot_plan.json --config PROJECT/config.json --out PROJECT/render
 python scripts/cinema.py episode --plan PROJECT/shot_plan.json --config PROJECT/config.json --out PROJECT/render
-python scripts/cinema.py shot --plan PROJECT/shot_plan.json --shot-id s001 --config PROJECT/config.json --out PROJECT/shot_s001
-python scripts/cinema.py image --prompt "Original cinematic character" --config PROJECT/config.json --out PROJECT/images
-python scripts/cinema.py inspect PROJECT/render/episode_01.mp4 --plan PROJECT/shot_plan.json
+python scripts/cinema.py shot --plan PROJECT/shot_plan.json --shot-id SHOT_ID --config PROJECT/config.json --out PROJECT/shot-render
+python scripts/cinema.py image --prompt "USER_REQUESTED_IMAGE" --config PROJECT/config.json --out PROJECT/images
+python scripts/cinema.py inspect PROJECT/render/episode_NN.mp4 --plan PROJECT/shot_plan.json
 python scripts/cinema.py studio --out PROJECT/render
 python scripts/cinema.py review --out PROJECT/render
 python scripts/cinema.py render --out PROJECT/render
 ```
 
-Without `--allow-paid`, generation commands estimate only. After user authorization, add `--allow-paid --budget-usd AMOUNT`. Resume an episode with `resume --out PROJECT/render --allow-paid --budget-usd ORIGINAL_AMOUNT`.
+Generation commands without paid flags estimate only; `plan --plan` can save its explicitly requested local packet. Resume with `resume --out PROJECT/render --allow-paid --budget-usd ORIGINAL_AMOUNT`. Never create a new directory to evade a prior uncertain charge.
 
 ## Deliver
 
-Return the full MP4 and links to `manifest.json`, `qc_report.json`, `cost_report.json`, `characters.json`, `shot_plan.json`, and subtitles. Mention native versus post-upscaled resolution and all unresolved review items. Output names are `episode_NN.mp4`; standalone shot runs also retain source clips under `shots/SHOT_ID/`. Offline demonstrations are always `TEST_ONLY_episode_NN.mp4` with `real_model_generation=false` and cannot be accepted as a film.
+Return the user's full requested MP4 and project reports: manifest, QC, quality review, costs, characters, scenes, shot plan, director/continuity/edit data and subtitles. Disclose native versus post-upscaled resolution and unresolved audiovisual review items. Output numbering `episode_NN.mp4` follows the user's plan, not a bundled episode.
 
-Use the complete 180-second example [episode01.plan.json](assets/episode01.plan.json) for 《被开除后，我的真实身份曝光了》第一集, or adapt its story with the same full-episode scope. No API keys or billing permission are bundled.
+Keep **Offline Tested**, **Media Pipeline Verified**, **Provider Live Verified**, **Full Episode Rendered** and **Editorially Reviewed** distinct. Missing real evidence stays Pending. Offline exports are `TEST_ONLY_`, with `test_only=true` and `real_model_generation=false`, and never count as a movie. No API keys or billing permission are bundled.

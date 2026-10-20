@@ -72,7 +72,7 @@ def test_D_character_bible_reuse_and_identity_guard(tmp_path, settings, plan):
 def test_E_multi_voice_chinese_timeline_and_subtitles(tmp_path, settings, plan):
     api = MockOpenAI()
     ledger = Ledger(tmp_path / "tasks.db", 10, True)
-    plan.shots[0].dialogue = [Dialogue(character="lin_chen", text="测试中文对白", start=0.25, end=1.75)]
+    plan.shots[0].dialogue = [Dialogue(character="actor_a", text="测试中文对白", start=0.25, end=1.75)]
     audio, timings = AudioEngine(settings, ledger, api).dialogue(plan.shots[0], plan.characters, tmp_path / "audio")
     assert audio.is_file() and timings[0]["start"] == 0.25
     assert api.calls[0]["voice"] == "cedar" and api.calls[0]["text"] == "测试中文对白"
@@ -149,8 +149,8 @@ def test_incomplete_or_padded_episode_plan_rejected(plan, field, value):
 def test_overlapping_dialogue_and_unknown_speaker_rejected(plan):
     data = plan.model_dump()
     data["shots"][0]["dialogue"] = [
-        {"character": "lin_chen", "text": "甲", "start": 0, "end": 1.2},
-        {"character": "lin_chen", "text": "乙", "start": 1.1, "end": 1.9}]
+        {"character": "actor_a", "text": "甲", "start": 0, "end": 1.2},
+        {"character": "actor_a", "text": "乙", "start": 1.1, "end": 1.9}]
     with pytest.raises(ValidationError, match="overlapping"):
         Plan.model_validate(data)
     data["shots"][0]["dialogue"] = [{"character": "unknown", "text": "甲", "start": 0, "end": 1}]
@@ -159,7 +159,7 @@ def test_overlapping_dialogue_and_unknown_speaker_rejected(plan):
 
 
 def test_budget_estimate_includes_whole_episode_retries_and_speech(settings, plan):
-    plan.shots[0].dialogue = [Dialogue(character="lin_chen", text="你好", start=0.5, end=1.5)]
+    plan.shots[0].dialogue = [Dialogue(character="actor_a", text="你好", start=0.5, end=1.5)]
     result = estimate(plan, settings)
     assert result["missing_rates"] == []
     assert result["all_attempts_and_configured_fallbacks_ceiling_usd"] == 0.83
@@ -185,7 +185,7 @@ def test_reference_content_changes_video_cache_key(tmp_path, settings, plan):
 def test_subtitle_overflow_and_ass_override_are_not_accepted(plan, tmp_path):
     with pytest.raises(CinemaError, match="two safe lines"):
         wrap_subtitle("中文" * 50, 20)
-    plan.shots[0].dialogue = [Dialogue(character="lin_chen", text=r"{\pos(999,999)}", start=0.1, end=1.8)]
+    plan.shots[0].dialogue = [Dialogue(character="actor_a", text=r"{\pos(999,999)}", start=0.1, end=1.8)]
     _, ass = subtitles(plan, tmp_path)
     assert r"\pos" not in ass.read_text(encoding="utf-8")
 

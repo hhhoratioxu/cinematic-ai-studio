@@ -1,6 +1,6 @@
 [project]
 name = "cinematic-ai-studio"
-version = "0.5.0"
+version = "0.5.1"
 description = "Codex skill and resumable real AI video production tools"
 requires-python = ">=3.11"
 

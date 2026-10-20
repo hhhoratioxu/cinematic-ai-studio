@@ -48,6 +48,8 @@ class HTTP:
 
 def download(url: str, output: Path, client: httpx.Client | None = None, max_bytes=1024 * 1024 * 1024):
     """Separate unauthenticated client; resume only a matching byte range."""
+    from workspace import ensure_external_project
+    output = ensure_external_project(output)
     if urlparse(url).scheme != "https":
         raise CinemaError("Provider download must use HTTPS")
     output.parent.mkdir(parents=True, exist_ok=True)

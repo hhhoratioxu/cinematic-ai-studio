@@ -9,6 +9,8 @@ from quality_control import probe
 
 
 def normalize_shot(source: Path, audio: Path, output: Path, shot, spec, settings):
+    from workspace import ensure_external_project
+    output = ensure_external_project(output)
     info = probe(source, settings)
     if not info["video"] or info["duration"] + 0.08 < shot.duration:
         raise CinemaError(f"{shot.id}: source footage shorter than the shot; never extend or loop video")
@@ -32,6 +34,8 @@ def normalize_shot(source: Path, audio: Path, output: Path, shot, spec, settings
 
 
 def export_episode(clips: list[Path], plan, directory: Path, settings, music: Path | None = None, test_only=False):
+    from workspace import ensure_external_project
+    directory = ensure_external_project(directory)
     directory.mkdir(parents=True, exist_ok=True)
     # Generated filenames contain no quotes; concat is never built from story/dialogue strings.
     for i, clip in enumerate(clips):

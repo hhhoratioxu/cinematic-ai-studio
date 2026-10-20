@@ -8,10 +8,10 @@ import shutil
 from datetime import datetime, timezone
 from pathlib import Path
 
+from common import content_key
+from distribution_policy import distribution_files
 
 ROOT = Path(__file__).resolve().parents[1]
-CONTENT = ["SKILL.md", "agents", "references", "scripts", "assets", "tests",
-           "requirements.txt", "requirements-dev.txt", "pyproject.toml", "README.md", "CHANGELOG.md", "LICENSE"]
 
 
 def file_hashes(directory):
@@ -26,6 +26,7 @@ def install(destination: Path, upgrade=False):
         raise FileExistsError(f"Destination already exists: {destination}. Install to a new path or review it first.")
     if destination == ROOT or ROOT in destination.parents:
         raise ValueError("Install outside the source repository")
+    files = distribution_files(ROOT)
     backup = None
     if destination.exists():
         if destination.is_symlink() or getattr(destination, "is_junction", lambda: False)():
@@ -33,10 +34,12 @@ def install(destination: Path, upgrade=False):
         manifest = destination / ".install-manifest.json"
         if manifest.is_file():
             expected = json.loads(manifest.read_text(encoding="utf-8"))["files"]
+            recognized = file_hashes(destination) == expected
         else:
-            legacy = ROOT / "assets" / "legacy-v0.1.0.sha256.json"
-            expected = json.loads(legacy.read_text(encoding="utf-8")) if legacy.is_file() else {}
-        if not expected or file_hashes(destination) != expected:
+            legacy = ROOT / "assets" / "legacy-install-fingerprints.json"
+            fingerprints = json.loads(legacy.read_text(encoding="utf-8")) if legacy.is_file() else {}
+            recognized = content_key(file_hashes(destination)) in fingerprints.values()
+        if not recognized:
             raise ValueError("Existing skill contains unrecognized/user-modified files; preserve and review before upgrading")
         stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
         backup = destination.parent.parent / "skill-backups" / f"{destination.name}-{stamp}"
@@ -46,15 +49,10 @@ def install(destination: Path, upgrade=False):
     destination.parent.mkdir(parents=True, exist_ok=True)
     destination.mkdir()
     try:
-        for name in CONTENT:
-            source = ROOT / name
-            if source.is_dir():
-                shutil.copytree(source, destination / name,
-                                ignore=shutil.ignore_patterns("__pycache__", ".pytest_cache", "*.pyc", "*.part"))
-            elif source.is_file():
-                shutil.copy2(source, destination / name)
-            else:
-                raise FileNotFoundError(f"Missing release content: {source}")
+        for source in files:
+            target = destination / source.relative_to(ROOT)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source, target)
         from version import VERSION
         (destination / ".install-manifest.json").write_text(json.dumps(
             {"version": VERSION, "backup": str(backup) if backup else None, "files": file_hashes(destination)},

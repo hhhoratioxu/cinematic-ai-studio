@@ -32,6 +32,8 @@ def media_registry(directory):
 
 
 def create_server(directory: Path, port=0):
+    from workspace import ensure_external_project
+    directory = ensure_external_project(directory)
     directory = directory.resolve(strict=True)
     session_token = secrets.token_urlsafe(32)
     html = (Path(__file__).resolve().parents[1] / "assets" / "studio.html").read_bytes()

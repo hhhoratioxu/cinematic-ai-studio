@@ -24,6 +24,8 @@ from video_engine import VideoEngine, decoded_signature, validate_video_plan
 def process_shot(plan, shot, settings, ledger, directory, revision=None):
     """One independently cacheable unit, also used by bounded local regeneration."""
     import json
+    from workspace import ensure_external_project
+    directory = ensure_external_project(directory)
     from shutil import copy2
     root = directory / "shots" / shot.id
     if revision:
@@ -210,7 +212,8 @@ def render_episode(plan: Plan, settings: Settings, directory: Path, budget: floa
     from fonts import select_font
     needs_subtitles = plan.output.burn_subtitles and any(s.dialogue for s in plan.shots)
     plan = plan.model_copy(update={"output": select_font(plan.output, needed=needs_subtitles)})
-    directory = directory.resolve()
+    from workspace import ensure_external_project
+    directory = ensure_external_project(directory)
     directory.mkdir(parents=True, exist_ok=True)
     edit = directory / "edit"
     edit.mkdir(exist_ok=True)

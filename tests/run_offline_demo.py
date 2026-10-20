@@ -15,9 +15,10 @@ from editing_engine import export_episode, normalize_shot
 from fonts import select_font
 from image_engine import ImageEngine
 from mock_provider import MockOpenAI
-from models import Character, Dialogue, Output, Plan, Settings, Shot
+from models import Dialogue, Output, Plan, Settings, Shot
 from quality_control import inspect_video, require_pass
 from state import Ledger
+from fixtures import generic_character
 
 
 def run(directory: Path):
@@ -25,10 +26,7 @@ def run(directory: Path):
     directory.mkdir(parents=True, exist_ok=True)
     settings = Settings(lipsync="off", vision_qc=False,
                         ceilings_usd={"openai:image": 0.1, "openai:tts": 0.03})
-    cast = [Character(id="actor_a", name="林辰", age=28, face="oval adult face", hair="short black hair",
-        build="tall slim build", wardrobe="navy suit", temperament="quiet resolve", voice="cedar"),
-        Character(id="actor_b", name="苏雨晴", age=30, face="round adult face", hair="shoulder length black hair",
-        build="average build", wardrobe="cream suit", temperament="calm and direct", voice="marin")]
+    cast = [generic_character("actor_a", "cedar"), generic_character("actor_b", "marin")]
     shots = []
     for i, character in enumerate([cast[0], cast[1], cast[0]]):
         shots.append(Shot(id=f"test_s{i + 1:03d}", characters=[character.id], duration=2,

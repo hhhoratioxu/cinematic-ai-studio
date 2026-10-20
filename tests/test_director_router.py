@@ -10,6 +10,7 @@ from common import CinemaError, content_key
 from compatibility import snapshots
 from continuity_engine import continuity_report, effective_cast
 from director_engine import migrate, production_packet
+from fixtures import generic_plan
 from models import Plan, Settings, VideoProviderConfig, read_model
 from video_engine import validate_video_plan
 
@@ -41,21 +42,21 @@ def test_continuity_change_requires_specific_declared_reason(plan):
     from models import ContinuityState
     first = plan.shots[0].model_copy(deep=True)
     second = first.model_copy(update={"id": "s002"}, deep=True)
-    first.scene_id = second.scene_id = "office"
-    first.continuity_out = ContinuityState(held_props={"lin_chen": ["phone"]}, axis="door-desk")
-    second.continuity_in = ContinuityState(held_props={"lin_chen": []}, axis="desk-door")
+    first.scene_id = second.scene_id = "test_grid"
+    first.continuity_out = ContinuityState(held_props={"actor_a": ["calibration marker"]}, axis="A-B")
+    second.continuity_in = ContinuityState(held_props={"actor_a": []}, axis="B-A")
     p = plan.model_copy(update={"shots": [first, second], "target_seconds": 4})
     report = continuity_report(p)
     assert len(report["errors"]) == 2
-    second.change_reason = "He puts the phone down and camera crosses with a motivated move"
-    second.intentional_changes = ["held_props.lin_chen", "axis"]
+    second.change_reason = "Calibration subject releases the marker while the camera changes reference axis"
+    second.intentional_changes = ["held_props.actor_a", "axis"]
     assert not continuity_report(p)["errors"]
 
 
 def test_versioned_costume_needs_dedicated_reference_not_default_image(plan):
     from models import Blocking
     plan.characters[0].costumes = {"evening": "black tuxedo and white shirt"}
-    plan.shots[0].blocking = [Blocking(character="lin_chen", wardrobe_version="evening")]
+    plan.shots[0].blocking = [Blocking(character="actor_a", wardrobe_version="evening")]
     with pytest.raises(CinemaError, match="front reference"):
         effective_cast(plan, plan.shots[0])
     plan.characters[0].reference_sets = {"evening": {"front": "evening.png"}}
@@ -93,9 +94,9 @@ def test_native_audio_never_silently_routes_to_silent_model(plan, settings):
         validate_video_plan(plan, settings, require_keys=False)
 
 
-def test_full_default_v2_packet_is_varied_complete_and_capable(tmp_path):
+def test_full_generic_v2_fixture_is_varied_complete_and_capable(tmp_path):
     root = Path(__file__).resolve().parents[1]
-    plan = read_model(root / "assets/episode01.plan.json", Plan)
+    plan = generic_plan()
     settings = read_model(root / "assets/config.example.json", Settings)
     assert plan.version == 2 and len({s.duration for s in plan.shots}) >= 4
     assert plan.target_seconds == 180 and len(plan.shots) == 30
@@ -129,9 +130,9 @@ def test_v2_story_planner_has_full_episode_output_allowance_and_stable_cache(tmp
             write_json(output, migrate(plan).model_dump())
             return {"evidence": "offline_mock_planner"}
     ledger = Ledger(tmp_path / "tasks.db", 10, True)
-    result = plan_story("An employee defends himself", 2, "live_action", settings, ledger,
+    result = plan_story("Non-narrative calibration input for an offline schema test", 2, "live_action", settings, ledger,
                         tmp_path / "plan.json", Planner())
-    resumed = plan_story("An employee defends himself", 2, "live_action", settings, ledger,
+    resumed = plan_story("Non-narrative calibration input for an offline schema test", 2, "live_action", settings, ledger,
                          tmp_path / "other.json", Planner())
     assert result.version == 2 and resumed == result
     assert len(calls) == 1 and calls[0]["max_tokens"] == 32768

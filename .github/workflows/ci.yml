@@ -31,7 +31,7 @@ jobs:
         run: python -m pip install -r requirements-dev.txt
       - name: Lint
         run: python -m ruff check scripts tests
-      - name: Validate skill metadata and sample plan
+      - name: Audit generic distribution, metadata and synthetic fixtures
         run: python tests/validate_distribution.py
       - name: Offline A-H, motion, director, recovery and loopback workbench tests
         run: python -m pytest -q --junitxml=test-results.xml

@@ -8,7 +8,8 @@ import subprocess
 import zipfile
 from pathlib import Path
 
-from install_skill import CONTENT, ROOT
+from distribution_policy import audit_tracked, distribution_files
+from install_skill import ROOT
 from version import VERSION
 
 
@@ -17,11 +18,8 @@ def package(directory: Path):
     if clean.returncode == 0 and clean.stdout.strip():
         raise RuntimeError("Commit reviewed source before packaging so the archive matches its source revision")
     directory.mkdir(parents=True, exist_ok=True)
-    files = []
-    for name in CONTENT:
-        source = ROOT / name
-        files += sorted(p for p in source.rglob("*") if p.is_file()) if source.is_dir() else [source]
-    files = [p for p in files if "__pycache__" not in p.parts and not p.name.endswith((".pyc", ".part"))]
+    files = distribution_files(ROOT)
+    audit_tracked(ROOT)
     archive = directory / f"cinematic-ai-studio-v{VERSION}.zip"
     with zipfile.ZipFile(archive, "w", zipfile.ZIP_DEFLATED) as z:
         for path in sorted(files):

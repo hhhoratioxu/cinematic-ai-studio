@@ -32,7 +32,7 @@ def parser():
         q = sub.add_parser(name)
         q.add_argument("--plan", type=Path)
         q.add_argument("--story-file", type=Path)
-        q.add_argument("--seconds", type=int, default=180)
+        q.add_argument("--seconds", type=int, help="Requested runtime; required with --story-file")
         q.add_argument("--mode", choices=["live_action", "anime", "motion_comic", "ai_drama"], default="ai_drama")
         q.add_argument("--bible", type=Path, help="Reuse a persistent characters.json across episodes")
         if name == "shot":
@@ -96,7 +96,7 @@ def parser():
 
 def generation_args(q):
     q.add_argument("--config", type=Path)
-    q.add_argument("--out", type=Path, default=Path("output/cinematic-studio"))
+    q.add_argument("--out", type=Path, help="External project directory; defaults to a new unique local project")
     q.add_argument("--budget-usd", type=float)
     q.add_argument("--allow-paid", action="store_true", help="Explicitly authorize paid actions up to the given budget")
 
@@ -184,6 +184,15 @@ def load_plan(args, settings):
 
 def main(argv=None):
     args = parser().parse_args(argv)
+    from workspace import ensure_external_project, new_project_directory
+    if hasattr(args, "out"):
+        args.out = args.out or new_project_directory()
+        if args.command not in ("status", "cost", "estimate") and not (args.command == "review" and not args.decision):
+            args.out = ensure_external_project(args.out)
+    if args.command == "migrate":
+        args.output = ensure_external_project(args.output)
+    if args.command == "inspect" and args.report:
+        args.report = ensure_external_project(args.report)
     if args.command == "doctor":
         return doctor()
     if args.command == "providers":
@@ -299,6 +308,8 @@ def main(argv=None):
         if args.story_file:
             if args.plan:
                 raise CinemaError("Choose either --plan or --story-file")
+            if args.seconds is None or not 2 <= args.seconds <= 3600:
+                raise CinemaError("Story input requires an explicit --seconds between 2 and 3600; no fixed production is assumed")
             from image_engine import rate
             ceiling = rate(settings, "openai:planner")
             emit({"stage": "planning_estimate", "ceiling_usd": ceiling,
@@ -330,6 +341,8 @@ def main(argv=None):
             from video_engine import validate_video_plan
             report = estimate(plan, settings)
             report["capability_checks"] = validate_video_plan(plan, settings, require_keys=False)
+            if args.command == "plan":
+                report["project_directory"] = str(args.out.resolve())
             emit(report)
             if args.command in ("estimate", "plan") or not args.allow_paid:
                 if args.command == "plan":

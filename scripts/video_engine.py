@@ -94,6 +94,8 @@ class VideoEngine:
         self.factories = factories or {"runway": Runway, "kling": Kling}
 
     def generate(self, plan, shot, characters, first_frame, directory: Path, revision=None):
+        from workspace import ensure_external_project
+        directory = ensure_external_project(directory)
         directory.mkdir(parents=True, exist_ok=True)
         failures = []
         choices, skipped = route(plan, shot, self.settings)

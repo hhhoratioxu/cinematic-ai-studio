@@ -1,33 +1,28 @@
 # Cinematic AI Studio
 
-面向 OpenAI Codex 的可安装 Agent Skill，配套 Python 工具，用真实的视频生成 API 执行电影镜头和完整短剧流程。
+面向 Codex 的通用 AI 电影制作 Skill，支持真人电影、动漫、动态漫画和完整 AI 短剧。根据用户每次提供的创意、故事、剧本或分镜，建立独立本地项目，调用真实模型制作动态镜头，再完成配音、口型、声音、剪辑、字幕和质量审核。
 
-**v0.5.0 提供完整的真实模型调用路径、逐镜制作数据、局部重做和本地制作工作台。已验证离线代码和真实 FFmpeg 媒体处理；真实模型、完整 AI 正片与人工影视验收仍为 Pending。** 本次开发没有配置生成 API Key，没有调用付费模型；版本号不代表画面已达到电影级质量。
+**v0.5.1 仓库只维护通用工具、配置结构和技术测试。** 不附带任何特定作品、剧情、角色故事或默认用户项目。用户素材、分镜、角色参考、生成结果和付费记录保存在仓库外；例如 `E:\SKILL\projects\<项目名>\`。
 
-## 能力与边界
+## 能力与验收边界
 
-| 功能 | 实现 | 验证状态 |
-|---|---|---|
-| 四种视觉模式 | 真人、动漫、动态漫画、AI 短剧，统一结构化分镜 | 离线模式路由通过；实际视觉表现待模型验收 |
-| 图像与参考图编辑 | OpenAI Images；角色正面、侧面、全身与场景首帧 | 官方请求格式和 Mock 流程测试 |
-| 真实动态视频 | Runway、Kling 官方异步 API；下载、首帧、受支持模型的尾帧/Element | 请求契约、恢复与失败处理测试；真实生成待验收 |
-| 中文多角色配音 | OpenAI TTS、固定声音 ID、对白时间窗、有限速度调整 | 请求与音轨排程测试；真实普通话效果待验收 |
-| 口型同步 | Sync 官方动态视频+音频 API，单个可见说话者 | 上传/轮询契约测试；实际准确度、动漫适配待验收 |
-| 音效与音乐 | Runway 音效、授权本地素材、原创程序化氛围音乐、自动压低配乐 | 本地合成与混音通过；生成音效待验收 |
-| 字幕、剪辑、MP4 | SRT/ASS、字体测量换行、FFmpeg、H.264/AAC | 真正执行导出与解码验证 |
-| QC | 时长、帧率、尺寸、音轨、黑屏、冻结、缺失镜头、解码重复；可选视觉复核 | 本地检测通过；人物/动作/口型保留不确定性 |
-| 预算和恢复 | SQLite 原子费用预留、并发上限、有限重试、内容缓存、已知任务恢复 | 包含中断、损坏缓存、预算并发等测试 |
-| 导演与连续性 v2 | 故事主线、冲突、反转、高潮、悬念；变长镜头、三段动作、站位/视线/焦点；Scene Bible、服装版本/道具/轴线 | 结构和变化校验通过；实际画面连续性待验收 |
-| 运动分析 | 全片均匀抽样、LK 光流、RANSAC 相机补偿、主体区域残差、重复内容、疑似平移缩放静图、突变/闪烁 | 真实编码测试片检测；不确定、静止特写和微表情进入人工复核 |
-| 模型路由 | 按已核实能力过滤，再按配置顺序/用途偏好/费用上界选择；可配置同一厂商多个模型 | 离线请求与选择测试；不编造质量评分 |
-| 局部重做与重剪 | 单镜头修订保留原始/口型素材；既有动态素材重剪；有权使用的动态视频导入 | 重做上限、原预算、未知收费阻断、零 API 重剪验证 |
-| 本地工作台 | 角色/场景/镜头/任务/成本/质量、原片与成片预览、哈希绑定人工复核 | 本机令牌、来源检查、范围读取测试；不提供后台付费接口 |
+| 能力 | 实现与边界 |
+|---|---|
+| 四种制作模式 | `live_action`、`anime`、`motion_comic`、`ai_drama`；实际画面效果须用真实模型验收 |
+| 图像与角色参考 | OpenAI 图像生成/编辑，正面、侧面、全身、表情参考；角色档案与服装版本跨镜头复用 |
+| 导演与连续性 | 结构化故事分析、动作节拍、站位、视线、焦点、镜头运动、Scene Bible、道具/服装/光照/轴线变化检查 |
+| 真实动态视频 | Runway、Kling 官方适配器，按输入、时长、比例、帧控制、音频能力及用户偏好选择配置模型 |
+| 普通话配音与口型 | 固定声线、说话风格/情绪/速度意图、实测音轨时长适配；Sync 对已有动态视频处理，单个可见说话者策略 |
+| 声音、剪辑、输出 | 对白/SFX/BGM、淡入淡出、重叠配乐提示、对白优先混音，逐镜剪辑、SRT/ASS、H.264/AAC MP4 |
+| 运动与质量 | 解码、规格、冻结/黑屏、重复、光流、相机补偿、主体区域残差、疑似平移缩放静图、闪烁；不确定结果需人工复核 |
+| 恢复与局部制作 | 内容缓存、已知任务恢复、下载恢复、单镜头有限重做、原片/口型版本保留、已有动态素材零 API 重剪 |
+| 本地工作台 | 角色、场景、镜头、任务、错误、预算、视频预览、当前素材哈希绑定的人工通过/驳回；只监听本机 |
 
-正式执行器不选择 Mock Provider，也不创建伪动态视频。`tests/run_offline_demo.py` 使用动态测试图案和音调，输出以 `TEST_ONLY_` 命名，只用于验证媒体处理。
+离线自动化和真实 FFmpeg 流程与模型效果分开验收。`Provider Live Verified`、`Full Episode Rendered`、`Editorially Reviewed` 在没有真实生成与人工审片证据时保持 **Pending**。技术测试不代表电影质量，测试音调不代表真实普通话，动态图案不代表 AI 正片。
 
-## 安装
+## 安装与调用
 
-需要 Python 3.11+、FFmpeg/FFprobe（含 libx264/libass），Windows 或 macOS；CI 也验证 Linux。API 费用与 ChatGPT/Codex 订阅分开。
+需要 Python 3.11+、FFmpeg/FFprobe（含 libx264、libass）和本机可用的中文字幕字体。CI 覆盖 Windows、macOS、Linux 和 Python 3.11/3.13。
 
 ```text
 git clone https://github.com/hhhoratioxu/cinematic-ai-studio.git
@@ -35,7 +30,7 @@ cd cinematic-ai-studio
 python -m venv .venv
 ```
 
-激活虚拟环境：Windows PowerShell 用 `.venv\Scripts\Activate.ps1`，macOS 用 `source .venv/bin/activate`。随后执行：
+Windows PowerShell 激活 `.venv\Scripts\Activate.ps1`；macOS/Linux 使用 `source .venv/bin/activate`。随后运行：
 
 ```text
 python -m pip install -r requirements.txt
@@ -43,134 +38,84 @@ python scripts/cinema.py doctor
 python scripts/install_skill.py
 ```
 
-安装器默认复制到 `~/.agents/skills/cinematic-ai-studio`，与当前 [OpenAI 官方 Skill 加载目录](https://learn.chatgpt.com/docs/build-skills)一致。旧版本宿主可通过 `--destination PATH` 选择 `~/.codex/skills/cinematic-ai-studio`。新装拒绝覆盖；升级已管理安装时运行 `python scripts/install_skill.py --upgrade`，先核对哈希，再把原目录保留到 `~/.agents/skill-backups/`。用户修改或未知文件会阻止覆盖，不修改其他 Skill。
+安装目录默认是 `~/.agents/skills/cinematic-ai-studio`，旧宿主可用 `--destination` 选择其他受支持目录。已有本工具管理的安装使用 `python scripts/install_skill.py --upgrade`：先验证文件，再完整备份到 `~/.agents/skill-backups/`；用户修改或未知文件会阻止覆盖。升级不操作仓库外的项目。
 
-安装后在新会话输入 `$cinematic-ai-studio`；如果暂时未出现，重启 Codex。使用安装目录里的脚本时，仍需选择已安装依赖的 Python。安装器不复制虚拟环境、凭据或生成项目。
+在 Codex 输入 `$cinematic-ai-studio`，接着提供本次创意/故事、模式、目标时长、画幅、语言和已授权素材。Codex 根据通用 Schema 为本次输入建立项目；没有内置作品可供默认生成。所有命令有 `--help`。
 
-FFmpeg 安装：Windows `winget install --id Gyan.FFmpeg --exact`；macOS `brew install ffmpeg-full`（普通 Homebrew `ffmpeg` 包可能不含 libass 字幕功能）。程序会优先寻找本机的 `ffmpeg-full`，`doctor` 会实际检查字幕、混音与编码能力。中文烧录字幕需本机中文字体，程序会寻找 Microsoft YaHei / PingFang / Noto Sans CJK；也可指定 `CINEMA_FONT` 或 `output.font_file`。
+FFmpeg：Windows 可安装 Gyan.FFmpeg；macOS 使用 `ffmpeg-full` 以获得 libass；Linux 安装 ffmpeg 和本地 CJK 字体。`doctor` 实际检查工具与媒体能力，只检查 Key 是否存在，不请求生成。字体可由 `output.font_file` 或 `CINEMA_FONT` 指向有权使用的本地文件，不随安装包分发专有字体。
 
-## 配置与成本
+## 项目与配置
 
-从 `assets/config.example.json` 复制一份项目配置。仅通过环境变量配置需要的 Key：
+以 `E:\SKILL\projects\my-film\` 为例，由用户为每个作品选择独立目录。故事写入该目录的 `story.txt`，参考图片、角色档案、分镜和全部生成记录也保留在此。将 [config.example.json](assets/config.example.json) 复制成项目的 `config.json`，不要覆盖已有配置。[characters.example.json](assets/characters.example.json) 仅说明字段结构，实际角色由用户故事定义。
 
-- `OPENAI_API_KEY`：图像、参考图编辑、配音、可选剧本规划和视觉 QC。
-- `RUNWAYML_API_SECRET`：Runway 视频、生成音效。
+只通过环境变量配置需要的凭据：
+
+- `OPENAI_API_KEY`：图像/参考编辑、TTS、可选规划和视觉检查。
+- `RUNWAYML_API_SECRET`：Runway 视频及生成音效。
 - `KLING_API_KEY`，或 `KLING_ACCESS_KEY` + `KLING_SECRET_KEY`：Kling 视频。
 - `SYNC_API_KEY`：独立口型同步。
 
-示例配置的 `ceilings_usd` 故意为空，防止把过期价格或演示数字当作真实报价。按当前官方文档、账户计价和所选模型填入每次图像/TTS/规划/视觉复核及每秒视频/音效/口型同步的**费用上界**，详见 [Provider 配置指南](references/provider-guide.md)。
+`ceilings_usd` 故意为空。根据当前官方文档、账户计价及所选模型填写每次图像/TTS/规划/视觉检查、每秒视频/口型/音效的费用上界，详见 [Provider 指南](references/provider-guide.md)。这些是原子预留上界，实际账单须与平台对账；失败和未知提交不自动退回预留。
 
-保留的 OpenAI 合同已进入官方弃用窗口：`gpt-image-1.5` 计划于 2026-12-01 停用，GPT-4.1 mini 快照为 2027-01-14，列出的 GPT-4o mini TTS 快照为 2027-01-06。正式制作前需按 Provider 指南核对当前别名、账户可用性和后续迁移；本版未把尚未实现的替代接口冒充兼容。提供的完整 `--plan` 不调用额外规划模型。
+沿用的 OpenAI 合同有已公布的弃用窗口，当前日期与迁移边界见 Provider 指南。正式制作前核对别名、账户可用性、请求字段和费用；不静默切换到尚未验证的新接口。
 
-生成命令默认只输出估算。只有显式 `--allow-paid --budget-usd AMOUNT` 才能产生费用。每一步在提交前原子预留费用，超限停止，失败和未知结果继续占用预留，不自动退回额度。未确认收费结果时不会重复提交。
+CLI 未指定 `--out` 时，为每次新制作选择 `~/CinematicAIStudio/projects/` 下的独立目录；可用 `CINEMA_PROJECTS_DIR` 改变默认项目根目录。生产写入禁止进入任一 Cinematic AI Studio 仓库/安装目录。原有外部项目的 `--out`、账本与预算在恢复时保持不变。
 
-预算记录约束的是用户配置的上界，真实账单需与平台核对；程序不会把估算冒充发票。价格变化、低估单价和账户其他任务不能由本地账本控制，应搭配 Provider 的账户消费限制。不得把本地预算宣称为平台级绝对费用保证。
+## 从当前用户输入开始制作
 
-## 完整第一集
+Codex 可以使用 `schema plan`，直接把当前用户的故事变成项目内的 `shot_plan.json`，不产生额外规划 API 费用。分镜时长必须精确覆盖本次目标，按动作和对白变化，不能重复片段、循环、冻结或黑屏补齐。
 
-随包提供《被开除后，我的真实身份曝光了》第一集的 **30 个镜头、180 秒**完整 v2 分镜，时长在 3/4/5/6/7/8 秒间按情节变化，包含林辰、苏雨晴、王总，冲突、调查、身份反转及结尾悬念。附角色关系/状态/表情参考计划、Scene Bible、逐镜站位/视线/焦点/动作节拍、道具与服装连续性、配乐提示。这是可执行的制作输入，尚未生成正片。
-
-先准备 `PROJECT/config.json` 中的真实费用上界，再估算：
+以下路径中的 `PROJECT` 代表仓库外的用户项目，命令不包含付费授权：
 
 ```text
-python scripts/cinema.py estimate --plan assets/episode01.plan.json --config PROJECT/config.json
+python scripts/cinema.py schema plan
+python scripts/cinema.py character --bible PROJECT/characters.json
+python scripts/cinema.py estimate --plan PROJECT/shot_plan.json --config PROJECT/config.json
+python scripts/cinema.py plan --plan PROJECT/shot_plan.json --config PROJECT/config.json --out PROJECT/render
+python scripts/cinema.py studio --out PROJECT/render
+python scripts/cinema.py episode --plan PROJECT/shot_plan.json --config PROJECT/config.json --out PROJECT/render
 ```
 
-在用户已明确授权对应美元预算后执行（将 `AMOUNT` 换成获准数额）：
+最后一条在未带 `--allow-paid` 时仍只估算。用户明确批准美元预算后，才给生成命令添加 `--allow-paid --budget-usd AMOUNT`。API Key、一般电影请求或示例中的参数都不独立构成消费授权。
+
+也可将当前用户的 `story.txt` 交给预算内规划接口。`--story-file` 必须明确指定 `--seconds`，没有固定作品或时长。下面先询问本次用户要求的时长，并只显示规划估算；真正执行仍需单独添加既有授权的付费参数：
+
+```powershell
+$Seconds = [int](Read-Host '本次作品的目标时长（秒）')
+python scripts/cinema.py episode --story-file PROJECT/story.txt --seconds $Seconds --mode live_action --config PROJECT/config.json --out PROJECT/render
+```
+
+`shot --plan PROJECT/shot_plan.json --shot-id SHOT_ID --out PROJECT/shot-render` 制作指定镜头；`--bible PREVIOUS_PROJECT/characters.json` 复用跨集角色。单镜头仍是片段，不能代替用户要求的完整作品。v1 计划继续读取；`migrate --plan OLD.json --output NEW.v2.json` 保留原文件，推断内容需要复核。
+
+## 审核、恢复和重剪
 
 ```text
-python scripts/cinema.py episode --plan assets/episode01.plan.json --config PROJECT/config.json --out PROJECT/episode01 --allow-paid --budget-usd AMOUNT
+python scripts/cinema.py status --out PROJECT/render
+python scripts/cinema.py cost --out PROJECT/render
+python scripts/cinema.py review --out PROJECT/render
+python scripts/cinema.py render --out PROJECT/render
+python scripts/cinema.py resume --out PROJECT/render --allow-paid --budget-usd ORIGINAL_AMOUNT
 ```
 
-也可以从故事自动规划并完成制作，规划调用另行记录成本：
+`status`、`cost`、只读 `review` 不生成素材。`render` 不构造付费执行器，验证来源哈希后用既有动态源片和混合音轨重剪，可更改同一组镜头的顺序、配乐、输出规格；改变时长/对白须显式修订镜头。`regenerate --out PROJECT/render --shot-id SHOT_ID --note REASON --allow-paid --budget-usd ORIGINAL_AMOUNT` 只重做指定镜头，保留版本与费用，受原预算和次数上限约束。
 
-```text
-python scripts/cinema.py episode --story-file assets/episode01.story.txt --seconds 180 --mode ai_drama --config PROJECT/config.json --out PROJECT/story_episode01 --allow-paid --budget-usd AMOUNT
-```
+`reconcile` 只挂接已确认的任务或文件；未知提交先对账，不删除账本重买。默认 Sync 要求单个可见说话者；运动不确定的原片先做 `review --raw --scope motion`，再考虑付费口型处理。工作台的重做按钮只复制命令，不提交付费请求。审核须记录实际观察、复核人、当前媒体 SHA-256；素材改变后原通过记录失效。
 
-Codex 本身可以先依据 `schema plan` 写好分镜，再使用 `--plan`，省去额外规划 API。默认竖屏 1080×1920、24fps、中文配音/字幕、H.264/AAC。更改计划中的 `output` 可用横屏或其他已验证比例。后期统一分辨率的记录会明确指出是否进行了普通放大。
+每个项目保留生成的 `episode_NN.mp4`、原始/口型镜头、角色与分镜、任务数据库、字幕、导演/场景/连续性/剪辑数据、技术和人工审核、费用报告。编号来自项目计划。技术成功状态仍为 `rendered_requires_editorial_review`。实际身份、动作、表演、解剖、字幕字形和口型需要观看素材。
 
-恢复与检查：
+## 仓库与安装包边界
 
-```text
-python scripts/cinema.py resume --out PROJECT/episode01 --allow-paid --budget-usd ORIGINAL_AMOUNT
-python scripts/cinema.py inspect PROJECT/episode01/episode_01.mp4 --plan assets/episode01.plan.json
-```
+GitHub 保留 Python 引擎、Skill、文档、通用配置/角色结构、安装脚本及技术测试。`.gitignore` 屏蔽项目目录、故事/分镜、参考图片、视频/音频、数据库、生成记录、Key 和费用文件。CI 审核受跟踪文件；安装器和打包器使用同一允许清单，即使文件被忽略也不会被递归打进包。意外出现的未批准输入会阻止安装/打包。
 
-不完整任务保留全部成功素材与账本。未知提交先用 `reconcile` 挂接已确认的任务 ID 或返回文件；具体参数见 `--help` 与 Provider 指南。不要为了恢复而删除账本或使用新的输出目录重买同一批素材。
-
-其他入口：`image`、`character`、`shot`、`plan`、`providers`、`schema`，均有 `--help`。用 `--bible PREVIOUS_RUN/characters.json` 复用跨集角色。`shot` 的结果是单镜头片段，不能替代完整一集。v1 继续读取；`migrate --plan OLD.json --output NEW.v2.json` 保留原文件，推断的动作与缺失场景需导演复核。
-
-## 本地工作台、审核与局部恢复
-
-可先创建一个零生成费用的工作区，再打开工作台：
-
-```text
-python scripts/cinema.py plan --plan assets/episode01.plan.json --config PROJECT/config.json --out PROJECT/preview
-python scripts/cinema.py studio --out PROJECT/preview
-```
-
-对已开始制作的项目，使用实际的 `--out PROJECT/episode01`。终端输出带随机会话令牌的本机地址并尝试打开浏览器；`--no-open --port 8765` 可手动访问。只监听 `127.0.0.1`，视频读取限于项目内注册素材。不要转发带令牌的地址。工作台显示项目实存数据和 Pending 状态。
-
-```text
-python scripts/cinema.py status --out PROJECT/episode01
-python scripts/cinema.py cost --out PROJECT/episode01
-python scripts/cinema.py review --out PROJECT/episode01
-python scripts/cinema.py render --out PROJECT/episode01
-```
-
-`render` 只重用已验收的动态源片和混合音轨，不构造 Provider/付费执行器；可修复输出格式或用 `--plan EDIT.json` 重排同一组镜头、修改配乐/输出规格。时长和对白变化需显式修订镜头。人工 approve/reject 须提供素材当前 SHA-256、复核人和实际观察。素材变更后原通过记录失效。运动不确定的原片在付费口型同步前需复核，可在工作台“任务”页查看/批准原片，或使用 `review --raw --scope motion`。
-
-```text
-python scripts/cinema.py review --out PROJECT/episode01 --target s001 --scope motion --decision approve --reviewer "NAME" --note "实际审片观察" --sha256 EXACT_MEDIA_SHA256 --raw
-python scripts/cinema.py regenerate --out PROJECT/episode01 --shot-id s001 --note "重做原因" --allow-paid --budget-usd ORIGINAL_AMOUNT --render
-```
-
-`regenerate` 只走指定镜头流程，其他镜头不提交生成；可用 `--shot-file SHOT.json` 替换其方向/动作，ID 与时长保持一致。固定原预算和 `max_shot_regenerations`，保留旧片和修订历史；未知扣费先对账，已知在途修订沿原任务恢复，不自动增加预算或次数。
-
-有权使用的动态素材可填写 `source_video` 与 `source_license`，仍经过解码、时长、运动、重复与音频检查。来源记录为 `user_supplied_dynamic_video`，不会标成 AI 模型证据。详见 [v0.5 制作与审核](references/production-v2.md)。
-
-## 输出
-
-```text
-PROJECT/episode01/
-  episode_01.mp4
-  manifest.json
-  qc_report.json
-  cost_report.json
-  estimate.json
-  quality_review.json
-  director_plan.json
-  scene_bible.json
-  continuity_report.json
-  edit_decision_list.json
-  dialogue_plan.json
-  reviews.json (有人工记录时)
-  revisions.json (有局部重做时)
-  characters.json
-  shot_plan.json
-  run.json
-  tasks.sqlite3
-  characters/ scenes/ shots/ normalized/ audio/
-  edit/subtitles.srt
-  edit/subtitles.ass
-  edit/subtitle_layout.json
-```
-
-`manifest.json` 在完整技术检查通过后为 `rendered_requires_editorial_review`；失败为 `incomplete`。人物换脸、肢体、表演、口型与实际字幕渲染仍需看完整视频。视觉模型三帧辅助检查也不能保证整段连续表演合格。
-
-## 不产生费用的测试
+不要将用户故事改成测试 Fixture 或文档范例。`tests/fixtures.py` 仅程序化生成校准主体、动作和 Schema 字段，独立覆盖完整多镜头时间线；生产代码不导入这些 Fixture。合成媒体只生成在临时/外部目录。
 
 ```text
 python -m pip install -r requirements-dev.txt
+python tests/validate_distribution.py
 python -m pytest -q
-python tests/run_offline_demo.py --out OUTPUT_TEST_ONLY
+python tests/run_offline_demo.py --out EXTERNAL_TEST_DIRECTORY
 ```
 
-测试禁止真实外网连接；工作台集成测试只放行本机回环。显式区分 Mock API、真实 FFmpeg 后期处理与未执行的模型端到端验收。保留原 A–H 测试，增加运动、导演/连续性、路由、局部修订、工作台和安装升级覆盖。Mock 声音是音调，不能称为真实普通话配音；测试图案不能称为真人/动漫电影。
+测试保留视频、配音、口型请求、预算、恢复、运动、导演/连续性、路由、修订、工作台、安装等覆盖。离线测试禁止外网，工作台集成仅放行回环。`TEST_ONLY_` 输出是测试证据，不能当作电影。旧版本发布与 Git 历史按版本保留，当前发行包遵循通用内容边界。
 
-## 结构与资料
-
-入口是 [SKILL.md](SKILL.md)，实现位于 `scripts/`，测试位于 `tests/`，默认案例位于 `assets/`。进一步阅读：[电影风格](references/cinematic-style.md)、[人物一致性](references/character-consistency.md)、[分镜](references/shot-generation.md)、[官方 Provider 与预算配置](references/provider-guide.md)、[声音与字幕](references/audio-pipeline.md)、[质量检测](references/quality-control.md)。
-
-MIT 许可适用于本仓库代码与文档。模型服务、生成素材和用户导入素材分别遵循相应平台及素材的许可条件。
+更多资料：[电影风格](references/cinematic-style.md)、[角色一致性](references/character-consistency.md)、[分镜](references/shot-generation.md)、[Provider](references/provider-guide.md)、[声音](references/audio-pipeline.md)、[QC](references/quality-control.md)、[v2 制作](references/production-v2.md)。MIT 适用于代码和文档；服务与用户素材遵循各自许可。

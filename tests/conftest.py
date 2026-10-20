@@ -5,7 +5,8 @@ import socket
 import pytest
 
 from common import command, media_tool
-from models import Character, Plan, Settings, Shot
+from models import Plan, Settings, Shot
+from fixtures import generic_character
 
 
 @pytest.fixture(autouse=True)
@@ -28,18 +29,16 @@ def settings():
 
 @pytest.fixture
 def character():
-    return Character(id="lin_chen", name="林辰", age=28, face="oval face, dark eyes",
-                     hair="short black hair", build="178cm, slim build", wardrobe="navy suit, white shirt",
-                     temperament="quiet, self-controlled", voice="cedar")
+    return generic_character()
 
 
 @pytest.fixture
 def shot(character):
-    return Shot(id="s001", characters=[character.id], duration=2, subject="Lin Chen at the door",
-        action="He takes two steps forward, turns his head, raises his right hand and opens the door.",
-        expression="calm determination", environment="modern office, morning", camera="medium",
-        lighting="soft window light", temporal_motion="First he steps, then turns, finally opens the door.",
-        continuity="Same navy suit and office door")
+    return Shot(id="s001", characters=[character.id], duration=2, subject="Synthetic calibration subject",
+        action="The test subject raises a hand, turns toward a mark, then lowers the hand.",
+        expression="neutral test expression", environment="plain calibration grid", camera="medium",
+        lighting="neutral test fill", temporal_motion="First raise a hand, then turn, finally lower the hand.",
+        continuity="Same calibration grid and neutral outfit")
 
 
 @pytest.fixture

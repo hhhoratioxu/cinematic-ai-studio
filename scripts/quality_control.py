@@ -128,6 +128,8 @@ def inspect_episode(path, plan, settings):
 
 
 def frame_samples(path: Path, directory: Path, settings, duration: float):
+    from workspace import ensure_external_project
+    directory = ensure_external_project(directory)
     directory.mkdir(parents=True, exist_ok=True)
     frames = []
     for i, t in enumerate((0.2, duration / 2, max(0.2, duration - 0.25))):

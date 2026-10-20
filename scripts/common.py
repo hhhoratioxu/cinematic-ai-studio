@@ -40,6 +40,8 @@ def content_key(value) -> str:
 
 
 def atomic_bytes(path: Path, data: bytes):
+    from workspace import ensure_external_project
+    path = ensure_external_project(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     fd, tmp = tempfile.mkstemp(dir=path.parent, prefix=path.name + ".", suffix=".part")
     try:

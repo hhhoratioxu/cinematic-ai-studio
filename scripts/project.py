@@ -147,8 +147,9 @@ def quality_review(directory, manifest=None, save=True):
 
 
 def status(directory):
+    from version import VERSION
     plan, settings, saved = project_plan(directory)
-    return {"title": plan.title, "version": "0.5.0", "mode": plan.mode,
+    return {"title": plan.title, "version": VERSION, "mode": plan.mode,
             "plan": plan.model_dump(), "configured_models": [c.model_dump() for c in settings.video],
             "manifest": read_json(directory / "manifest.json", {}), "cost": task_snapshot(directory),
             "accepted": [e for e in accepted_shots(directory, plan).values() if e],

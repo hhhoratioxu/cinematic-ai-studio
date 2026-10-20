@@ -20,6 +20,8 @@ def micros(value: float | str) -> int:
 
 class Ledger:
     def __init__(self, path: Path, budget: float, authorized: bool):
+        from workspace import ensure_external_project
+        path = ensure_external_project(path)
         path.parent.mkdir(parents=True, exist_ok=True)
         self.path = path
         self.lock = threading.RLock()
@@ -69,6 +71,8 @@ class Ledger:
             return dict(row) if row else None
 
     def reserve(self, key: str, provider: str, kind: str, ceiling: float, payload: dict, output: Path):
+        from workspace import ensure_external_project
+        output = ensure_external_project(output)
         amount = micros(ceiling)
         with self.transaction():
             row = self.db.execute("SELECT * FROM tasks WHERE key=?", (key,)).fetchone()
@@ -117,6 +121,8 @@ class Ledger:
 @contextmanager
 def run_lock(directory: Path):
     """OS releases lock on process death; no stale sentinel requiring unsafe deletion."""
+    from workspace import ensure_external_project
+    directory = ensure_external_project(directory)
     directory.mkdir(parents=True, exist_ok=True)
     with (directory / ".run.lock").open("a+b") as f:
         f.seek(0)

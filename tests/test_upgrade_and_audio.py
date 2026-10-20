@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from pathlib import Path
 
 import pytest
 
@@ -27,7 +26,7 @@ def test_managed_upgrade_preserves_a_verified_backup_and_rejects_user_edits(tmp_
 
 
 def test_matching_tts_is_reused_across_revision_directories_without_repurchase(tmp_path, settings, plan):
-    plan.shots[0].dialogue = [Dialogue(character="lin_chen", text="这是测试", start=0.1, end=1.8)]
+    plan.shots[0].dialogue = [Dialogue(character="actor_a", text="这是测试", start=0.1, end=1.8)]
     plan.characters[0].speech_style = "Restrained, short breaths and thoughtful pauses"
     plan.characters[0].speech_speed = 0.95
     api = MockOpenAI()
@@ -90,9 +89,16 @@ def test_interrupted_revision_uses_saved_override_instead_of_changing_request(tm
     assert len(project.read_json(tmp_path / "revisions.json")) == 1
 
 
-def test_legacy_manifest_is_derived_from_preserved_release():
+def test_unmanaged_legacy_upgrade_uses_an_opaque_tree_fingerprint(tmp_path, monkeypatch):
     import json
-    root = Path(__file__).resolve().parents[1]
-    manifest = json.loads((root / "assets/legacy-v0.1.0.sha256.json").read_text(encoding="utf-8"))
-    assert len(manifest) >= 40 and "scripts/cinema.py" in manifest
-    assert all(len(sha) == 64 for sha in manifest.values())
+    import install_skill
+    from common import content_key
+    source = install(tmp_path / "source")
+    legacy = install(tmp_path / "skills/legacy")
+    (legacy / ".install-manifest.json").unlink()
+    expected = content_key(install_skill.file_hashes(legacy))
+    (source / "assets/legacy-install-fingerprints.json").write_text(json.dumps({"test-legacy": expected}), encoding="utf-8")
+    monkeypatch.setattr(install_skill, "ROOT", source)
+    assert install(legacy, upgrade=True) == legacy
+    backups = list((tmp_path / "skill-backups").glob("legacy-*"))
+    assert len(backups) == 1 and content_key(install_skill.file_hashes(backups[0])) == expected
