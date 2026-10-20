@@ -109,7 +109,7 @@ class Plan(Contract):
     title: str = Field(min_length=1)
     episode: int = Field(default=1, ge=1, le=999)
     mode: Literal["live_action", "anime", "motion_comic", "ai_drama"] = "live_action"
-    visual_style: str = "realistic cinematic live action, original actors, restrained performances"
+    visual_style: str = ""
     language: str = "zh-CN"
     target_seconds: int = Field(ge=2, le=3600)
     output: Output = Field(default_factory=Output)
@@ -118,6 +118,18 @@ class Plan(Contract):
     music_file: str | None = None
     music_license: str | None = None
     original_score: bool = True
+
+    @model_validator(mode="before")
+    @classmethod
+    def mode_style_defaults(cls, data):
+        if isinstance(data, dict) and not data.get("visual_style"):
+            defaults = {
+                "live_action": "cinematic live action, original performers, natural skin and body motion",
+                "anime": "cinematic animated film, consistent anime design, articulated body and facial animation",
+                "motion_comic": "animated motion comic, consistent ink and shading, articulated character motion",
+                "ai_drama": "cinematic live action drama, original performers, restrained natural acting"}
+            data = {**data, "visual_style": defaults.get(data.get("mode", "live_action"), defaults["live_action"])}
+        return data
 
     @model_validator(mode="after")
     def check_coverage(self):

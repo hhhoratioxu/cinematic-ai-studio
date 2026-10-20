@@ -37,6 +37,7 @@ class MockVideo:
     def __init__(self, states=None):
         self.submissions = 0
         self.polls = 0
+        self.specs = []
         self.states = list(states or ["complete"])
 
     def validate(self, spec):
@@ -44,6 +45,7 @@ class MockVideo:
 
     def submit(self, spec, key):
         self.submissions += 1
+        self.specs.append(dict(spec))
         return "mock-" + key[:12]
 
     def poll(self, task_id, spec):

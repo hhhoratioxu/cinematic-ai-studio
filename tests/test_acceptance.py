@@ -34,7 +34,7 @@ def test_A_image_generation_and_reference_edit_cache(tmp_path, settings):
 
 @pytest.mark.parametrize("mode", ["live_action", "anime", "motion_comic", "ai_drama"])
 def test_B_C_real_video_route_with_mock_adapter(tmp_path, settings, plan, media_factory, mode):
-    plan.mode = mode
+    plan = Plan.model_validate({**plan.model_dump(), "mode": mode, "visual_style": ""})
     provider = MockVideo()
     ledger = Ledger(tmp_path / "tasks.db", 10, True)
     def download(url, output):
@@ -45,6 +45,9 @@ def test_B_C_real_video_route_with_mock_adapter(tmp_path, settings, plan, media_
     video, report = engine.generate(plan, plan.shots[0], plan.characters, None, tmp_path / "shot")
     assert inspect_video(video, settings, 2)["technical_pass"]
     assert provider.submissions == 1 and report["evidence"] == "synthetic_test_fixture"
+    if mode in ("anime", "motion_comic"):
+        assert "articulated" in provider.specs[0]["prompt"]
+        assert "live action" not in provider.specs[0]["prompt"]
     ledger.close()
 
 
