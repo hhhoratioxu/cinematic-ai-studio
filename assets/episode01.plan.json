@@ -1,0 +1,963 @@
+{
+  "version": 1,
+  "title": "被开除后，我的真实身份曝光了",
+  "episode": 1,
+  "mode": "ai_drama",
+  "visual_style": "cinematic live action, original Chinese actors, restrained natural performances",
+  "language": "zh-CN",
+  "target_seconds": 180,
+  "output": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 24,
+    "burn_subtitles": true,
+    "font_file": null,
+    "font_name": "Noto Sans CJK SC",
+    "crf": 18
+  },
+  "characters": [
+    {
+      "id": "lin_chen",
+      "name": "林辰",
+      "age": 28,
+      "face": "oval face, dark almond eyes",
+      "hair": "short neat black hair",
+      "build": "178cm, lean build",
+      "wardrobe": "navy suit, white shirt, no tie",
+      "temperament": "quiet confidence",
+      "voice": "cedar",
+      "style": "original Chinese cinematic actor",
+      "references": {}
+    },
+    {
+      "id": "su_yuqing",
+      "name": "苏雨晴",
+      "age": 30,
+      "face": "soft angular face, dark eyes",
+      "hair": "straight shoulder-length black hair",
+      "build": "168cm, slender build",
+      "wardrobe": "cream suit, small silver earrings",
+      "temperament": "calm and observant",
+      "voice": "marin",
+      "style": "original Chinese cinematic actor",
+      "references": {}
+    },
+    {
+      "id": "wang",
+      "name": "王总",
+      "age": 45,
+      "face": "square face, broad brow",
+      "hair": "slicked-back black hair",
+      "build": "175cm, stocky build",
+      "wardrobe": "charcoal suit, burgundy tie",
+      "temperament": "arrogant, easily unsettled",
+      "voice": "onyx",
+      "style": "original Chinese cinematic actor",
+      "references": {}
+    }
+  ],
+  "shots": [
+    {
+      "id": "s001",
+      "characters": [
+        "lin_chen",
+        "wang"
+      ],
+      "duration": 6,
+      "subject": "Lin Chen faces Wang across a desk",
+      "action": "Wang throws a folder across the desk. Lin catches its edge, steps back and looks up.",
+      "expression": "anger rising",
+      "environment": "same modern corporate office, morning",
+      "camera": "wide",
+      "lighting": "soft cool window light, warm desk practicals",
+      "temporal_motion": "Start the action, develop it continuously, settle into the next reaction.",
+      "continuity": "Keep the same office geography, wardrobe and eyelines; cut to the next motivated reaction.",
+      "dialogue": [],
+      "sounds": [
+        {
+          "id": "folder_impact",
+          "prompt": "A paper folder slides across a wooden office desk and lands with a restrained thump, no speech.",
+          "start": 0.5,
+          "duration": 2,
+          "gain_db": -18,
+          "file": null,
+          "license": null
+        }
+      ],
+      "first_frame": null,
+      "last_frame": null,
+      "elements": [],
+      "generation": "image_to_video",
+      "native_audio": "replace"
+    },
+    {
+      "id": "s002",
+      "characters": [
+        "wang"
+      ],
+      "duration": 6,
+      "subject": "Wang confronts an employee",
+      "action": "Wang pushes his chair back, rises, points toward the door and delivers his verdict.",
+      "expression": "cold contempt",
+      "environment": "same modern corporate office, morning",
+      "camera": "medium",
+      "lighting": "soft cool window light, warm desk practicals",
+      "temporal_motion": "Start the action, develop it continuously, settle into the next reaction.",
+      "continuity": "Keep the same office geography, wardrobe and eyelines; cut to the next motivated reaction.",
+      "dialogue": [
+        {
+          "character": "wang",
+          "text": "林辰，你被开除了。",
+          "start": 1.0,
+          "end": 5.5,
+          "emotion": "cold contempt, natural Mandarin",
+          "delivery": "onscreen"
+        }
+      ],
+      "sounds": [],
+      "first_frame": null,
+      "last_frame": null,
+      "elements": [],
+      "generation": "image_to_video",
+      "native_audio": "replace"
+    },
+    {
+      "id": "s003",
+      "characters": [
+        "lin_chen"
+      ],
+      "duration": 6,
+      "subject": "Lin Chen receives the dismissal",
+      "action": "Lin blinks, draws a slow breath, lifts his chin and asks a controlled question.",
+      "expression": "contained anger",
+      "environment": "same modern corporate office, morning",
+      "camera": "close_up",
+      "lighting": "soft cool window light, warm desk practicals",
+      "temporal_motion": "Start the action, develop it continuously, settle into the next reaction.",
+      "continuity": "Keep the same office geography, wardrobe and eyelines; cut to the next motivated reaction.",
+      "dialogue": [
+        {
+          "character": "lin_chen",
+          "text": "理由呢？",
+          "start": 1.0,
+          "end": 5.5,
+          "emotion": "contained anger, natural Mandarin",
+          "delivery": "onscreen"
+        }
+      ],
+      "sounds": [],
+      "first_frame": null,
+      "last_frame": null,
+      "elements": [],
+      "generation": "image_to_video",
+      "native_audio": "replace"
+    },
+    {
+      "id": "s004",
+      "characters": [
+        "wang"
+      ],
+      "duration": 6,
+      "subject": "Wang uses the missing list as an accusation",
+      "action": "Wang taps a printed list, leans forward and chops the air as he assigns blame.",
+      "expression": "dismissive certainty",
+      "environment": "same modern corporate office, morning",
+      "camera": "low_angle",
+      "lighting": "soft cool window light, warm desk practicals",
+      "temporal_motion": "Start the action, develop it continuously, settle into the next reaction.",
+      "continuity": "Keep the same office geography, wardrobe and eyelines; cut to the next motivated reaction.",
+      "dialogue": [
+        {
+          "character": "wang",
+          "text": "客户名单丢了，总得有人负责。",
+          "start": 1.0,
+          "end": 5.5,
+          "emotion": "dismissive certainty, natural Mandarin",
+          "delivery": "onscreen"
+        }
+      ],
+      "sounds": [],
+      "first_frame": null,
+      "last_frame": null,
+      "elements": [],
+      "generation": "image_to_video",
+      "native_audio": "replace"
+    },
+    {
+      "id": "s005",
+      "characters": [
+        "lin_chen"
+      ],
+      "duration": 6,
+      "subject": "Lin restrains his reaction",
+      "action": "Lin lowers the folder onto the desk, straightens its corners and unclenches his hand.",
+      "expression": "hurt becoming resolve",
+      "environment": "same modern corporate office, morning",
+      "camera": "medium",
+      "lighting": "soft cool window light, warm desk practicals",
+      "temporal_motion": "Start the action, develop it continuously, settle into the next reaction.",
+      "continuity": "Keep the same office geography, wardrobe and eyelines; cut to the next motivated reaction.",
+      "dialogue": [],
+      "sounds": [],
+      "first_frame": null,
+      "last_frame": null,
+      "elements": [],
+      "generation": "image_to_video",
+      "native_audio": "replace"
+    },
+    {
+      "id": "s006",
+      "characters": [
+        "su_yuqing"
+      ],
+      "duration": 6,
+      "subject": "Su Yuqing intervenes",
+      "action": "Su walks through the office doorway, stops beside the desk and raises an open palm.",
+      "expression": "alert concern",
+      "environment": "same modern corporate office, morning",
+      "camera": "tracking",
+      "lighting": "soft cool window light, warm desk practicals",
+      "temporal_motion": "Start the action, develop it continuously, settle into the next reaction.",
+      "continuity": "Keep the same office geography, wardrobe and eyelines; cut to the next motivated reaction.",
+      "dialogue": [
+        {
+          "character": "su_yuqing",
+          "text": "先等等，调过监控了吗？",
+          "start": 1.0,
+          "end": 5.5,
+          "emotion": "alert concern, natural Mandarin",
+          "delivery": "onscreen"
+        }
+      ],
+      "sounds": [],
+      "first_frame": null,
+      "last_frame": null,
+      "elements": [],
+      "generation": "image_to_video",
+      "native_audio": "replace"
+    },
+    {
+      "id": "s007",
+      "characters": [
+        "wang"
+      ],
+      "duration": 6,
+      "subject": "Wang tries to stop scrutiny",
+      "action": "Wang pivots toward Su, shakes his head and closes the folder with a sharp motion.",
+      "expression": "irritation",
+      "environment": "same modern corporate office, morning",
+      "camera": "over_shoulder",
+      "lighting": "soft cool window light, warm desk practicals",
+      "temporal_motion": "Start the action, develop it continuously, settle into the next reaction.",
+      "continuity": "Keep the same office geography, wardrobe and eyelines; cut to the next motivated reaction.",
+      "dialogue": [
+        {
+          "character": "wang",
+          "text": "苏总，这件事不用你插手。",
+          "start": 1.0,
+          "end": 5.5,
+          "emotion": "irritation, natural Mandarin",
+          "delivery": "onscreen"
+        }
+      ],
+      "sounds": [],
+      "first_frame": null,
+      "last_frame": null,
+      "elements": [],
+      "generation": "image_to_video",
+      "native_audio": "replace"
+    },
+    {
+      "id": "s008",
+      "characters": [
+        "lin_chen"
+      ],
+      "duration": 6,
+      "subject": "Lin offers evidence of the backup",
+      "action": "Lin takes his phone out, unlocks it, turns its screen toward Wang and speaks evenly.",
+      "expression": "controlled confidence",
+      "environment": "same modern corporate office, morning",
+      "camera": "medium",
+      "lighting": "soft cool window light, warm desk practicals",
+      "temporal_motion": "Start the action, develop it continuously, settle into the next reaction.",
+      "continuity": "Keep the same office geography, wardrobe and eyelines; cut to the next motivated reaction.",
+      "dialogue": [
+        {
+          "character": "lin_chen",
+          "text": "我交过备份，收件人是你。",
+          "start": 1.0,
+          "end": 5.5,
+          "emotion": "controlled confidence, natural Mandarin",
+          "delivery": "onscreen"
+        }
+      ],
+      "sounds": [],
+      "first_frame": null,
+      "last_frame": null,
+      "elements": [],
+      "generation": "image_to_video",
+      "native_audio": "replace"
+    },
+    {
+      "id": "s009",
+      "characters": [
+        "wang"
+      ],
+      "duration": 6,
+      "subject": "Wang reacts to the evidence",
+      "action": "Wang glances down, swallows, touches his tie and quickly covers his phone with one hand.",
+      "expression": "a flash of panic",
+      "environment": "same modern corporate office, morning",
+      "camera": "extreme_close_up",
+      "lighting": "soft cool window light, warm desk practicals",
+      "temporal_motion": "Start the action, develop it continuously, settle into the next reaction.",
+      "continuity": "Keep the same office geography, wardrobe and eyelines; cut to the next motivated reaction.",
+      "dialogue": [],
+      "sounds": [],
+      "first_frame": null,
+      "last_frame": null,
+      "elements": [],
+      "generation": "image_to_video",
+      "native_audio": "replace"
+    },
+    {
+      "id": "s010",
+      "characters": [
+        "su_yuqing"
+      ],
+      "duration": 6,
+      "subject": "Su checks the retained email",
+      "action": "Su scrolls through the email, stops at the timestamp, looks toward Lin and nods once.",
+      "expression": "growing certainty",
+      "environment": "same modern corporate office, morning",
+      "camera": "close_up",
+      "lighting": "soft cool window light, warm desk practicals",
+      "temporal_motion": "Start the action, develop it continuously, settle into the next reaction.",
+      "continuity": "Keep the same office geography, wardrobe and eyelines; cut to the next motivated reaction.",
+      "dialogue": [
+        {
+          "character": "su_yuqing",
+          "text": "邮件还在，时间也对得上。",
+          "start": 1.0,
+          "end": 5.5,
+          "emotion": "growing certainty, natural Mandarin",
+          "delivery": "onscreen"
+        }
+      ],
+      "sounds": [],
+      "first_frame": null,
+      "last_frame": null,
+      "elements": [],
+      "generation": "image_to_video",
+      "native_audio": "replace"
+    },
+    {
+      "id": "s011",
+      "characters": [
+        "wang"
+      ],
+      "duration": 6,
+      "subject": "Wang dismisses the evidence",
+      "action": "Wang spreads his hands, forces a smile, then points away from the screen as he challenges it.",
+      "expression": "defensive hostility",
+      "environment": "same modern corporate office, morning",
+      "camera": "handheld",
+      "lighting": "soft cool window light, warm desk practicals",
+      "temporal_motion": "Start the action, develop it continuously, settle into the next reaction.",
+      "continuity": "Keep the same office geography, wardrobe and eyelines; cut to the next motivated reaction.",
+      "dialogue": [
+        {
+          "character": "wang",
+          "text": "一封邮件，能证明什么？",
+          "start": 1.0,
+          "end": 5.5,
+          "emotion": "defensive hostility, natural Mandarin",
+          "delivery": "onscreen"
+        }
+      ],
+      "sounds": [],
+      "first_frame": null,
+      "last_frame": null,
+      "elements": [],
+      "generation": "image_to_video",
+      "native_audio": "replace"
+    },
+    {
+      "id": "s012",
+      "characters": [
+        "lin_chen"
+      ],
+      "duration": 6,
+      "subject": "Lin calls for an independent audit",
+      "action": "Lin pockets his phone, takes one measured step forward and meets Wang’s gaze.",
+      "expression": "calm authority",
+      "environment": "same modern corporate office, morning",
+      "camera": "dolly_in",
+      "lighting": "soft cool window light, warm desk practicals",
+      "temporal_motion": "Start the action, develop it continuously, settle into the next reaction.",
+      "continuity": "Keep the same office geography, wardrobe and eyelines; cut to the next motivated reaction.",
+      "dialogue": [
+        {
+          "character": "lin_chen",
+          "text": "那就让审计组来证明。",
+          "start": 1.0,
+          "end": 5.5,
+          "emotion": "calm authority, natural Mandarin",
+          "delivery": "onscreen"
+        }
+      ],
+      "sounds": [],
+      "first_frame": null,
+      "last_frame": null,
+      "elements": [],
+      "generation": "image_to_video",
+      "native_audio": "replace"
+    },
+    {
+      "id": "s013",
+      "characters": [
+        "wang"
+      ],
+      "duration": 6,
+      "subject": "Wang invokes the board",
+      "action": "Wang steps around the chair, lifts one accusing finger and leans toward Lin.",
+      "expression": "blustering confidence",
+      "environment": "same modern corporate office, morning",
+      "camera": "low_angle",
+      "lighting": "soft cool window light, warm desk practicals",
+      "temporal_motion": "Start the action, develop it continuously, settle into the next reaction.",
+      "continuity": "Keep the same office geography, wardrobe and eyelines; cut to the next motivated reaction.",
+      "dialogue": [
+        {
+          "character": "wang",
+          "text": "你以为董事会会听你的？",
+          "start": 1.0,
+          "end": 5.5,
+          "emotion": "blustering confidence, natural Mandarin",
+          "delivery": "onscreen"
+        }
+      ],
+      "sounds": [],
+      "first_frame": null,
+      "last_frame": null,
+      "elements": [],
+      "generation": "image_to_video",
+      "native_audio": "replace"
+    },
+    {
+      "id": "s014",
+      "characters": [
+        "su_yuqing"
+      ],
+      "duration": 6,
+      "subject": "Su receives the audit team’s arrival message",
+      "action": "Su feels her phone vibrate, reads its message, straightens and turns toward the door.",
+      "expression": "surprised realization",
+      "environment": "same modern corporate office, morning",
+      "camera": "medium",
+      "lighting": "soft cool window light, warm desk practicals",
+      "temporal_motion": "Start the action, develop it continuously, settle into the next reaction.",
+      "continuity": "Keep the same office geography, wardrobe and eyelines; cut to the next motivated reaction.",
+      "dialogue": [
+        {
+          "character": "su_yuqing",
+          "text": "审计组已经到楼下了。",
+          "start": 1.0,
+          "end": 5.5,
+          "emotion": "surprised realization, natural Mandarin",
+          "delivery": "onscreen"
+        }
+      ],
+      "sounds": [
+        {
+          "id": "phone_vibrate",
+          "prompt": "A quiet mobile phone vibration on fabric in a silent office, no voices.",
+          "start": 0,
+          "duration": 1,
+          "gain_db": -22,
+          "file": null,
+          "license": null
+        }
+      ],
+      "first_frame": null,
+      "last_frame": null,
+      "elements": [],
+      "generation": "image_to_video",
+      "native_audio": "replace"
+    },
+    {
+      "id": "s015",
+      "characters": [
+        "lin_chen"
+      ],
+      "duration": 6,
+      "subject": "Lin retrieves an original contract",
+      "action": "Lin walks to his bag, kneels briefly, removes a sealed envelope and stands with it.",
+      "expression": "deliberate composure",
+      "environment": "same modern corporate office, morning",
+      "camera": "tracking",
+      "lighting": "soft cool window light, warm desk practicals",
+      "temporal_motion": "Start the action, develop it continuously, settle into the next reaction.",
+      "continuity": "Keep the same office geography, wardrobe and eyelines; cut to the next motivated reaction.",
+      "dialogue": [],
+      "sounds": [],
+      "first_frame": null,
+      "last_frame": null,
+      "elements": [],
+      "generation": "image_to_video",
+      "native_audio": "replace"
+    },
+    {
+      "id": "s016",
+      "characters": [
+        "lin_chen"
+      ],
+      "duration": 6,
+      "subject": "Lin introduces the contract",
+      "action": "Lin lays the envelope on the desk, slides it forward with two fingers and lifts his eyes.",
+      "expression": "quiet pressure",
+      "environment": "same modern corporate office, morning",
+      "camera": "medium",
+      "lighting": "soft cool window light, warm desk practicals",
+      "temporal_motion": "Start the action, develop it continuously, settle into the next reaction.",
+      "continuity": "Keep the same office geography, wardrobe and eyelines; cut to the next motivated reaction.",
+      "dialogue": [
+        {
+          "character": "lin_chen",
+          "text": "这份合同，今天到期。",
+          "start": 1.0,
+          "end": 5.5,
+          "emotion": "quiet pressure, natural Mandarin",
+          "delivery": "onscreen"
+        }
+      ],
+      "sounds": [],
+      "first_frame": null,
+      "last_frame": null,
+      "elements": [],
+      "generation": "image_to_video",
+      "native_audio": "replace"
+    },
+    {
+      "id": "s017",
+      "characters": [
+        "su_yuqing"
+      ],
+      "duration": 6,
+      "subject": "Su recognizes a corporate seal",
+      "action": "Su bends closer to the seal, pauses with her hand above it and looks sharply toward Lin.",
+      "expression": "recognition spreading",
+      "environment": "same modern corporate office, morning",
+      "camera": "extreme_close_up",
+      "lighting": "soft cool window light, warm desk practicals",
+      "temporal_motion": "Start the action, develop it continuously, settle into the next reaction.",
+      "continuity": "Keep the same office geography, wardrobe and eyelines; cut to the next motivated reaction.",
+      "dialogue": [],
+      "sounds": [],
+      "first_frame": null,
+      "last_frame": null,
+      "elements": [],
+      "generation": "image_to_video",
+      "native_audio": "replace"
+    },
+    {
+      "id": "s018",
+      "characters": [
+        "wang"
+      ],
+      "duration": 6,
+      "subject": "Wang tries to mock the contract",
+      "action": "Wang laughs once, sweeps his hand toward the envelope and shifts his weight uneasily.",
+      "expression": "forced amusement",
+      "environment": "same modern corporate office, morning",
+      "camera": "medium",
+      "lighting": "soft cool window light, warm desk practicals",
+      "temporal_motion": "Start the action, develop it continuously, settle into the next reaction.",
+      "continuity": "Keep the same office geography, wardrobe and eyelines; cut to the next motivated reaction.",
+      "dialogue": [
+        {
+          "character": "wang",
+          "text": "拿个信封，也想吓唬我？",
+          "start": 1.0,
+          "end": 5.5,
+          "emotion": "forced amusement, natural Mandarin",
+          "delivery": "onscreen"
+        }
+      ],
+      "sounds": [],
+      "first_frame": null,
+      "last_frame": null,
+      "elements": [],
+      "generation": "image_to_video",
+      "native_audio": "replace"
+    },
+    {
+      "id": "s019",
+      "characters": [
+        "su_yuqing"
+      ],
+      "duration": 6,
+      "subject": "Su confirms the seal’s significance",
+      "action": "Su points to the seal, compares it with her phone, then looks toward Wang and speaks firmly.",
+      "expression": "professional certainty",
+      "environment": "same modern corporate office, morning",
+      "camera": "close_up",
+      "lighting": "soft cool window light, warm desk practicals",
+      "temporal_motion": "Start the action, develop it continuously, settle into the next reaction.",
+      "continuity": "Keep the same office geography, wardrobe and eyelines; cut to the next motivated reaction.",
+      "dialogue": [
+        {
+          "character": "su_yuqing",
+          "text": "这个签章，是集团专用的。",
+          "start": 1.0,
+          "end": 5.5,
+          "emotion": "professional certainty, natural Mandarin",
+          "delivery": "onscreen"
+        }
+      ],
+      "sounds": [],
+      "first_frame": null,
+      "last_frame": null,
+      "elements": [],
+      "generation": "image_to_video",
+      "native_audio": "replace"
+    },
+    {
+      "id": "s020",
+      "characters": [
+        "lin_chen"
+      ],
+      "duration": 6,
+      "subject": "Lin’s authority becomes unmistakable",
+      "action": "Lin holds Wang’s gaze, lets his shoulders settle and delivers a quiet warning.",
+      "expression": "restrained disappointment",
+      "environment": "same modern corporate office, morning",
+      "camera": "dolly_in",
+      "lighting": "soft cool window light, warm desk practicals",
+      "temporal_motion": "Start the action, develop it continuously, settle into the next reaction.",
+      "continuity": "Keep the same office geography, wardrobe and eyelines; cut to the next motivated reaction.",
+      "dialogue": [
+        {
+          "character": "lin_chen",
+          "text": "我给过你一次机会。",
+          "start": 1.0,
+          "end": 5.5,
+          "emotion": "restrained disappointment, natural Mandarin",
+          "delivery": "onscreen"
+        }
+      ],
+      "sounds": [],
+      "first_frame": null,
+      "last_frame": null,
+      "elements": [],
+      "generation": "image_to_video",
+      "native_audio": "replace"
+    },
+    {
+      "id": "s021",
+      "characters": [
+        "wang"
+      ],
+      "duration": 6,
+      "subject": "Wang loses control of the confrontation",
+      "action": "Wang’s raised hand drops. He takes a half-step back, opens his mouth and asks the question.",
+      "expression": "fear replacing arrogance",
+      "environment": "same modern corporate office, morning",
+      "camera": "high_angle",
+      "lighting": "soft cool window light, warm desk practicals",
+      "temporal_motion": "Start the action, develop it continuously, settle into the next reaction.",
+      "continuity": "Keep the same office geography, wardrobe and eyelines; cut to the next motivated reaction.",
+      "dialogue": [
+        {
+          "character": "wang",
+          "text": "你到底是谁？",
+          "start": 1.0,
+          "end": 5.5,
+          "emotion": "fear replacing arrogance, natural Mandarin",
+          "delivery": "onscreen"
+        }
+      ],
+      "sounds": [],
+      "first_frame": null,
+      "last_frame": null,
+      "elements": [],
+      "generation": "image_to_video",
+      "native_audio": "replace"
+    },
+    {
+      "id": "s022",
+      "characters": [
+        "lin_chen"
+      ],
+      "duration": 6,
+      "subject": "Lin reveals his ownership",
+      "action": "Lin removes a slim document case, opens it and turns the ownership page toward Wang.",
+      "expression": "steady resolve",
+      "environment": "same modern corporate office, morning",
+      "camera": "close_up",
+      "lighting": "soft cool window light, warm desk practicals",
+      "temporal_motion": "Start the action, develop it continuously, settle into the next reaction.",
+      "continuity": "Keep the same office geography, wardrobe and eyelines; cut to the next motivated reaction.",
+      "dialogue": [
+        {
+          "character": "lin_chen",
+          "text": "三年前，我签下了这家公司。",
+          "start": 1.0,
+          "end": 5.5,
+          "emotion": "steady resolve, natural Mandarin",
+          "delivery": "onscreen"
+        }
+      ],
+      "sounds": [],
+      "first_frame": null,
+      "last_frame": null,
+      "elements": [],
+      "generation": "image_to_video",
+      "native_audio": "replace"
+    },
+    {
+      "id": "s023",
+      "characters": [
+        "su_yuqing"
+      ],
+      "duration": 6,
+      "subject": "Su recognizes the original shareholder signature",
+      "action": "Su studies the signature, lifts her eyes to Lin, draws a breath and begins to connect the facts.",
+      "expression": "astonishment",
+      "environment": "same modern corporate office, morning",
+      "camera": "medium",
+      "lighting": "soft cool window light, warm desk practicals",
+      "temporal_motion": "Start the action, develop it continuously, settle into the next reaction.",
+      "continuity": "Keep the same office geography, wardrobe and eyelines; cut to the next motivated reaction.",
+      "dialogue": [
+        {
+          "character": "su_yuqing",
+          "text": "原始股权文件的签名……",
+          "start": 1.0,
+          "end": 5.5,
+          "emotion": "astonishment, natural Mandarin",
+          "delivery": "onscreen"
+        }
+      ],
+      "sounds": [],
+      "first_frame": null,
+      "last_frame": null,
+      "elements": [],
+      "generation": "image_to_video",
+      "native_audio": "replace"
+    },
+    {
+      "id": "s024",
+      "characters": [
+        "lin_chen",
+        "su_yuqing"
+      ],
+      "duration": 6,
+      "subject": "The room’s power arrangement changes",
+      "action": "Lin walks to the head of the table. Su steps aside, then places the contract before his chair.",
+      "expression": "respect and calm authority",
+      "environment": "same modern corporate office, morning",
+      "camera": "wide",
+      "lighting": "soft cool window light, warm desk practicals",
+      "temporal_motion": "Start the action, develop it continuously, settle into the next reaction.",
+      "continuity": "Keep the same office geography, wardrobe and eyelines; cut to the next motivated reaction.",
+      "dialogue": [],
+      "sounds": [],
+      "first_frame": null,
+      "last_frame": null,
+      "elements": [],
+      "generation": "image_to_video",
+      "native_audio": "replace"
+    },
+    {
+      "id": "s025",
+      "characters": [
+        "wang"
+      ],
+      "duration": 6,
+      "subject": "Wang challenges the revealed family connection",
+      "action": "Wang shakes his head, grips the back of his chair and struggles to keep his voice steady.",
+      "expression": "disbelief and fear",
+      "environment": "same modern corporate office, morning",
+      "camera": "handheld",
+      "lighting": "soft cool window light, warm desk practicals",
+      "temporal_motion": "Start the action, develop it continuously, settle into the next reaction.",
+      "continuity": "Keep the same office geography, wardrobe and eyelines; cut to the next motivated reaction.",
+      "dialogue": [
+        {
+          "character": "wang",
+          "text": "不可能，林家的人早就离开了。",
+          "start": 1.0,
+          "end": 5.5,
+          "emotion": "disbelief and fear, natural Mandarin",
+          "delivery": "onscreen"
+        }
+      ],
+      "sounds": [],
+      "first_frame": null,
+      "last_frame": null,
+      "elements": [],
+      "generation": "image_to_video",
+      "native_audio": "replace"
+    },
+    {
+      "id": "s026",
+      "characters": [
+        "lin_chen"
+      ],
+      "duration": 6,
+      "subject": "Lin acknowledges a hidden past",
+      "action": "Lin turns his head toward Wang, gives a brief sad smile and then lets it disappear.",
+      "expression": "old hurt under control",
+      "environment": "same modern corporate office, morning",
+      "camera": "close_up",
+      "lighting": "soft cool window light, warm desk practicals",
+      "temporal_motion": "Start the action, develop it continuously, settle into the next reaction.",
+      "continuity": "Keep the same office geography, wardrobe and eyelines; cut to the next motivated reaction.",
+      "dialogue": [
+        {
+          "character": "lin_chen",
+          "text": "离开的是旧名字。",
+          "start": 1.0,
+          "end": 5.5,
+          "emotion": "old hurt under control, natural Mandarin",
+          "delivery": "onscreen"
+        }
+      ],
+      "sounds": [],
+      "first_frame": null,
+      "last_frame": null,
+      "elements": [],
+      "generation": "image_to_video",
+      "native_audio": "replace"
+    },
+    {
+      "id": "s027",
+      "characters": [
+        "su_yuqing"
+      ],
+      "duration": 6,
+      "subject": "Su formally acknowledges the chairman",
+      "action": "Su answers a call, listens, lowers the phone and turns respectfully toward Lin.",
+      "expression": "composed respect",
+      "environment": "same modern corporate office, morning",
+      "camera": "medium",
+      "lighting": "soft cool window light, warm desk practicals",
+      "temporal_motion": "Start the action, develop it continuously, settle into the next reaction.",
+      "continuity": "Keep the same office geography, wardrobe and eyelines; cut to the next motivated reaction.",
+      "dialogue": [
+        {
+          "character": "su_yuqing",
+          "text": "董事长，会议已经准备好了。",
+          "start": 1.0,
+          "end": 5.5,
+          "emotion": "composed respect, natural Mandarin",
+          "delivery": "onscreen"
+        }
+      ],
+      "sounds": [],
+      "first_frame": null,
+      "last_frame": null,
+      "elements": [],
+      "generation": "image_to_video",
+      "native_audio": "replace"
+    },
+    {
+      "id": "s028",
+      "characters": [
+        "wang"
+      ],
+      "duration": 6,
+      "subject": "Wang’s authority collapses",
+      "action": "Wang’s knees soften. He lowers himself into the chair, loosens his tie and looks toward the door.",
+      "expression": "defeat and apprehension",
+      "environment": "same modern corporate office, morning",
+      "camera": "wide",
+      "lighting": "soft cool window light, warm desk practicals",
+      "temporal_motion": "Start the action, develop it continuously, settle into the next reaction.",
+      "continuity": "Keep the same office geography, wardrobe and eyelines; cut to the next motivated reaction.",
+      "dialogue": [],
+      "sounds": [],
+      "first_frame": null,
+      "last_frame": null,
+      "elements": [],
+      "generation": "image_to_video",
+      "native_audio": "replace"
+    },
+    {
+      "id": "s029",
+      "characters": [
+        "lin_chen"
+      ],
+      "duration": 6,
+      "subject": "Lin orders the real investigation",
+      "action": "Lin closes the document case, turns toward the exit and stops with his hand on the door handle.",
+      "expression": "decisive focus",
+      "environment": "same modern corporate office, morning",
+      "camera": "tracking",
+      "lighting": "soft cool window light, warm desk practicals",
+      "temporal_motion": "Start the action, develop it continuously, settle into the next reaction.",
+      "continuity": "Keep the same office geography, wardrobe and eyelines; cut to the next motivated reaction.",
+      "dialogue": [
+        {
+          "character": "lin_chen",
+          "text": "现在，该查真正丢名单的人了。",
+          "start": 1.0,
+          "end": 5.5,
+          "emotion": "decisive focus, natural Mandarin",
+          "delivery": "onscreen"
+        }
+      ],
+      "sounds": [
+        {
+          "id": "door_handle",
+          "prompt": "A brushed metal office door handle turns with a soft mechanical click, no speech.",
+          "start": 4.5,
+          "duration": 1,
+          "gain_db": -18,
+          "file": null,
+          "license": null
+        }
+      ],
+      "first_frame": null,
+      "last_frame": null,
+      "elements": [],
+      "generation": "image_to_video",
+      "native_audio": "replace"
+    },
+    {
+      "id": "s030",
+      "characters": [
+        "su_yuqing"
+      ],
+      "duration": 6,
+      "subject": "A message links Lin’s father to the missing list",
+      "action": "Su reads a new message, freezes for a brief breath, then raises her head and calls after Lin.",
+      "expression": "shock and urgency",
+      "environment": "same modern corporate office, morning",
+      "camera": "dolly_in",
+      "lighting": "soft cool window light, warm desk practicals",
+      "temporal_motion": "Start the action, develop it continuously, settle into the next reaction.",
+      "continuity": "Keep the same office geography, wardrobe and eyelines; cut to the next motivated reaction.",
+      "dialogue": [
+        {
+          "character": "su_yuqing",
+          "text": "董事长，名单里还有你父亲。",
+          "start": 1.0,
+          "end": 5.5,
+          "emotion": "shock and urgency, natural Mandarin",
+          "delivery": "onscreen"
+        }
+      ],
+      "sounds": [],
+      "first_frame": null,
+      "last_frame": null,
+      "elements": [],
+      "generation": "image_to_video",
+      "native_audio": "replace"
+    }
+  ],
+  "music_file": null,
+  "music_license": null,
+  "original_score": true
+}
